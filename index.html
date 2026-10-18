@@ -1,268 +1,513 @@
+
 <!DOCTYPE html>
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport"
- content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>Undertale Piano Lab</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Piano Practice</title>
 <style>
-:root{
- --bg:#10131d;--panel:#1c2231;--text:#f3f5ff;
- --muted:#a7b0c8;--accent:#65e6bd;--red:#ff657a;
- --yellow:#ffdb70;--border:#343d53
-}
 *{box-sizing:border-box}
 body{
- margin:0;background:var(--bg);color:var(--text);
- font:14px system-ui,Arial,sans-serif
+  margin:0;padding:16px;background:#111522;color:#fff;
+  font-family:Arial,sans-serif
 }
-button,select,input{font:inherit}
+h1{font-size:22px}
 button,select{
- color:var(--text);background:#2a3348;border:1px solid var(--border);
- border-radius:9px;padding:9px;cursor:pointer
+  padding:10px;margin:4px;border:0;border-radius:8px;
+  background:#303a50;color:white;font-size:15px
 }
-button:active{transform:scale(.98)}
-button:disabled{opacity:.4}
-button.active{background:#145c50;border-color:var(--accent)}
-header{
- padding:12px 15px;display:flex;justify-content:space-between;
- align-items:center;gap:10px;flex-wrap:wrap;background:#171c29;
- border-bottom:1px solid var(--border)
-}
-h1{font-size:20px;margin:0}
-h2{font-size:15px;margin:0 0 10px}
-small,.muted{color:var(--muted)}
-main{padding:12px;max-width:1200px;margin:auto}
+button:active{background:#168d75}
 .panel{
- background:var(--panel);border:1px solid var(--border);
- border-radius:13px;padding:12px;margin-bottom:12px
+  background:#1d2434;padding:12px;margin:10px 0;
+  border-radius:12px
 }
-.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:10px}
-.stat{font-size:22px;font-weight:750}
-#status{color:var(--accent);font-weight:600}
-#pianoWrap{overflow-x:auto;padding:8px 0 12px}
-#piano{display:flex;position:relative;height:190px;min-width:600px}
+#status{color:#69e6c1}
+#piano{
+  display:flex;overflow-x:auto;padding:5px 0;
+  height:190px;min-width:600px
+}
+#keyboardScroll{overflow-x:auto}
 .key{
- position:relative;flex:1;min-width:0;border:1px solid #222;
- border-radius:0 0 6px 6px;background:#fff;color:#171717;
- height:170px;display:flex;align-items:flex-end;justify-content:center;
- padding:0 0 9px;font-size:11px;touch-action:manipulation
+  flex:0 0 43px;height:160px;background:white;color:#111;
+  border:1px solid #222;border-radius:0 0 6px 6px;
+  display:flex;align-items:flex-end;justify-content:center;
+  padding-bottom:8px;touch-action:manipulation
 }
 .key.black{
- background:#151923;color:white;position:absolute;z-index:2;
- height:105px;width:4.5%;min-width:23px;top:0;
- border:1px solid #555;border-radius:0 0 5px 5px;
- padding-bottom:6px
+  background:#151515;color:white;height:100px;
+  flex-basis:29px;margin-left:-15px;margin-right:-14px;
+  z-index:2;position:relative
 }
-.key.pressed,.key.target{background:var(--accent)!important;color:#111}
-.key.wrong{background:var(--red)!important}
-#pitchBar{height:12px;background:#30384a;border-radius:9px;overflow:hidden}
-#pitchFill{height:100%;width:0;background:var(--accent);transition:width .08s}
-canvas{display:block;width:100%;height:75px;background:#121723;border-radius:8px}
-label{display:flex;align-items:center;gap:6px;color:var(--muted)}
-input[type=range]{width:115px;accent-color:var(--accent)}
-input[type=checkbox]{accent-color:var(--accent)}
-select{max-width:100%}
-#songNotes{line-height:2;overflow-wrap:anywhere}
-.noteChip{padding:4px 7px;background:#2a3348;border-radius:6px;margin:2px}
-.noteChip.done{background:#145c50}
-.noteChip.current{outline:2px solid var(--yellow)}
-#log{max-height:100px;overflow:auto;color:var(--muted);font-size:12px}
-footer{text-align:center;padding:12px;color:var(--muted)}
-@media(max-height:500px) and (orientation:landscape){
- header{padding:6px 12px}h1{font-size:17px}
- main{padding:7px}.panel{padding:8px;margin-bottom:7px}
- #piano{height:155px}.key{height:145px}
- .key.black{height:90px}
-}
+.key.active{background:#64e6bc;color:#111}
+.big{font-size:26px;font-weight:bold}
+label{display:inline-block;margin:8px 4px}
 </style>
 </head>
 <body>
-<header>
- <div>
-  <h1>♥ Undertale Piano Lab</h1>
-  <small>Virtual piano · Mic tuner · WAIT practice</small>
- </div>
- <div class="row">
-  <span id="status">Siap</span>
-  <button id="audioBtn">🔊 Aktifkan suara</button>
- </div>
-</header>
+<h1>🎹 Piano Practice</h1>
 
-<main>
- <section class="panel">
-  <div class="row">
-   <button id="micBtn">🎙️ Nyalakan mikrofon</button>
-   <button id="waitBtn" class="active">WAIT: ON</button>
-   <button id="listenBtn">🎧 Dengarkan nada target</button>
-   <button id="nextBtn">Lewati →</button>
-   <button id="resetBtn">↺ Ulang latihan</button>
-  </div>
-  <p id="message">Aktifkan suara, pilih lagu, lalu tekan tombol piano.</p>
-  <div class="grid">
-   <div>
-    <small>Nada target</small>
-    <div class="stat" id="target">C4</div>
-   </div>
-   <div>
-    <small>Nada dari mikrofon</small>
-    <div class="stat" id="detected">—</div>
-   </div>
-   <div>
-    <small>Akurasi latihan</small>
-    <div class="stat" id="accuracy">0%</div>
-   </div>
-   <div>
-    <small>Skor / streak</small>
-    <div class="stat"><span id="score">0</span> / <span id="streak">0</span></div>
-   </div>
-  </div>
-  <div id="pitchBar"><div id="pitchFill"></div></div>
-  <small id="pitchInfo">Frekuensi: — · Selisih: —</small>
- </section>
+<div class="panel">
+  <button id="audioButton">Aktifkan suara piano</button>
+  <button id="micButton">Aktifkan mikrofon</button>
+  <p id="status">Siap. Aktifkan suara atau mikrofon.</p>
+  <p>Nada target:</p>
+  <div class="big" id="target">C4</div>
+  <p>Nada terdeteksi:</p>
+  <div class="big" id="detected">—</div>
+  <p id="frequency">Frekuensi: —</p>
+  <button id="nextButton">Nada berikutnya →</button>
+  <button id="resetButton">Ulangi latihan</button>
+</div>
 
- <section class="panel">
-  <h2>🎹 Keyboard dua oktaf</h2>
-  <div class="row">
-   <label>Oktaf awal
+<div class="panel">
+  <label>
+    Oktaf:
     <select id="octave">
-     <option value="3">C3–B4</option>
-     <option value="4" selected>C4–B5</option>
-     <option value="2">C2–B3</option>
+      <option value="2">C2–B3</option>
+      <option value="3">C3–B4</option>
+      <option value="4" selected>C4–B5</option>
     </select>
-   </label>
-   <label>Volume <input id="volume" type="range" min="0" max="100" value="75"></label>
-   <label>Transpose
-    <select id="transpose">
-     <option value="-12">-12</option><option value="-7">-7</option>
-     <option value="0" selected>0</option><option value="5">+5</option>
-     <option value="7">+7</option><option value="12">+12</option>
-    </select>
-   </label>
-   <label><input type="checkbox" id="showNames" checked> Nama nada</label>
-   <label><input type="checkbox" id="sustain"> Sustain</label>
-  </div>
-  <div id="pianoWrap"><div id="piano"></div></div>
-  <small>Sentuh tuts untuk bermain. Audio piano sampel memerlukan koneksi internet saat pertama kali dimuat.</small>
- </section>
+  </label>
+  <label>
+    <input type="checkbox" id="waitMode" checked>
+    Mode WAIT
+  </label>
+  <p>Tekan tuts piano untuk memainkan nada.</p>
+  <div id="keyboardScroll"><div id="piano"></div></div>
+</div>
 
- <section class="panel">
-  <h2>🎼 Pilih latihan</h2>
-  <div class="row">
-   <select id="song">
-    <option value="once">Undertale — Once Upon a Time (motif latihan)</option>
-    <option value="home">Undertale — Home (motif latihan)</option>
-    <option value="heart">Undertale — Heartache (motif latihan)</option>
-    <option value="sans">Undertale — sans. (motif latihan)</option>
-    <option value="finale">Undertale — Finale (motif latihan)</option>
-    <option value="asgore">Undertale — ASGORE (motif latihan)</option>
-    <option value="memory">Memory — latihan nada orisinal</option>
-    <option value="scale">C Major — tangga nada</option>
-    <option value="chromatic">Chromatic — latihan kromatis</option>
-   </select>
-   <label>Tempo <input id="tempo" type="range" min="45" max="180" value="90"><span id="tempoVal">90 BPM</span></label>
-   <label>Kesulitan
-    <select id="difficulty">
-     <option value="easy">Santai</option>
-     <option value="normal" selected>Normal</option>
-     <option value="hard">Sulit</option>
-    </select>
-   </label>
-   <button id="playSong">▶ Putar contoh</button>
-   <button id="stopSong">■ Stop</button>
-  </div>
-  <div id="songNotes"></div>
-  <p><small>Ini motif pendek untuk latihan, bukan rekonstruksi penuh atau transkripsi resmi lagu.</small></p>
- </section>
+<div class="panel">
+  <p>Progres: <span id="progress">0 / 8</span></p>
+  <p id="message">Tekan Aktifkan suara piano untuk mulai.</p>
+</div>
 
- <section class="grid">
-  <div class="panel">
-   <h2>🎙️ Deteksi mikrofon</h2>
-   <div class="row">
-    <label>Sensitivitas
-     <input id="sensitivity" type="range" min="1" max="30" value="8">
-    </label>
-    <label>Volume minimum
-     <input id="threshold" type="range" min="1" max="30" value="8">
-    </label>
-   </div>
-   <p><small>Gunakan headphone agar suara piano dari perangkat tidak masuk kembali ke mikrofon. Penyaring ini membantu mengurangi pemicu palsu, tetapi tidak bisa membedakan suara manusia dan piano secara sempurna.</small></p>
-   <label><input type="checkbox" id="octaveFix" checked> Koreksi oktaf pada mode WAIT</label>
-   <label><input type="checkbox" id="strict" checked> Tolak nada yang tidak stabil</label>
-   <label><input type="checkbox" id="autoAdvance" checked> Otomatis ke nada berikutnya</label>
-   <label><input type="checkbox" id="visualizer" checked> Visualisasi mikrofon</label>
-   <canvas id="wave" width="600" height="100"></canvas>
-  </div>
-  <div class="panel">
-   <h2>⏱️ Alat latihan</h2>
-   <div class="row">
-    <button id="metroBtn">Metronom: OFF</button>
-    <button id="recordBtn">● Rekam latihan</button>
-    <button id="playRecordBtn">▶ Putar rekaman</button>
-    <button id="clearRecordBtn">Hapus rekaman</button>
-   </div>
-   <p>Durasi: <b id="timer">00:00</b></p>
-   <p>Catatan: <b id="recordCount">0</b> nada direkam</p>
-   <div class="row">
-    <button id="saveBtn">Simpan progres</button>
-    <button id="loadBtn">Muat progres</button>
-    <button id="exportBtn">Ekspor progres JSON</button>
-   </div>
-   <p id="progressMsg" class="muted">Progres disimpan hanya pada browser ini.</p>
-  </div>
- </section>
-
- <section class="panel">
-  <h2>🏆 Statistik & log</h2>
-  <div class="row">
-   <span>Benar: <b id="correct">0</b></span>
-   <span>Salah: <b id="missed">0</b></span>
-   <span>Waktu latihan: <b id="elapsed">0 detik</b></span>
-   <button id="clearStats">Reset statistik</button>
-  </div>
-  <div id="log"></div>
- </section>
-
- <section class="panel">
-  <h2>✨ 40 fitur tambahan</h2>
-  <div id="featureList" class="grid"></div>
-  <small>Fitur berupa kontrol, indikator, dan alat bantu latihan yang ditampilkan di aplikasi; beberapa bergantung pada izin browser dan kemampuan perangkat.</small>
- </section>
-</main>
-<footer>Undertale Piano Lab · Satu file HTML · Simpan sebagai piano.html</footer>
-
-<script src="https://cdn.jsdelivr.net/npm/soundfont-player@0.12.0/dist/soundfont-player.min.js"></script>
 <script>
 "use strict";
 
-/* 1. DOM helper dan state */
 const $ = id => document.getElementById(id);
-const state = {
- audio:null, piano:null, audioReady:false, micStream:null,
- analyser:null, micData:null, micOn:false, raf:0,
- wait:true, song:[], index:0, score:0, streak:0,
- correct:0, missed:0, attempts:0, recording:false,
- records:[], recordStart:0, practiceStart:Date.now(),
- metro:false, metroTimer:null, songTimer:null,
- lastDetected:0, stableCount:0, lastMidi:null,
- playingNodes:[], fallback:false
-};
+const noteNames = [
+  "C","C#","D","D#","E","F",
+  "F#","G","G#","A","A#","B"
+];
 
-const NOTES=["C","C#","D","D#","E","F","F#","G","G#","A","A#","B"];
-const BLACK=new Set([1,3,6,8,10]);
+const exercise = [
+  "C4","D4","E4","F4","G4","A4","B4","C5"
+];
 
-/* 2. Log */
-function log(msg){
- const el=$("log"), line=document.createElement("div");
- line.textContent=new Date().toLocaleTimeString()+" — "+msg;
- el.prepend(line);
- while(el.children.length>35) el.lastChild.remove();
+let targetIndex = 0;
+let audioContext = null;
+let micStream = null;
+let analyser = null;
+let micBuffer = null;
+let micEnabled = false;
+let animationId = null;
+let soundfontInstrument = null;
+let soundfontLoading = false;
+let lastAccepted = 0;
+let lastDetectedMidi = null;
+let stableFrames = 0;
+
+function midiToName(midi){
+  return noteNames[((midi % 12) + 12) % 12] +
+    (Math.floor(midi / 12) - 1);
 }
-function status(msg){$("status").textContent=msg}
 
-/* 3. Audio context */
-function makeAudio(){
+function nameToMidi(name){
+  const match = /^([A-G]#?)(-?\d+)$/.exec(name);
+  if(!match) return 60;
+  return (Number(match[2]) + 1) * 12 +
+    noteNames.indexOf(match[1]);
+}
+
+function midiToFrequency(midi){
+  return 440 * Math.pow(2, (midi - 69) / 12);
+}
+
+function setStatus(text){
+  $("status").textContent = text;
+}
+
+function getAudioContext(){
+  if(!audioContext){
+    const AudioContextClass =
+      window.AudioContext || window.webkitAudioContext;
+
+    if(!AudioContextClass){
+      throw new Error("Browser tidak mendukung Web Audio.");
+    }
+
+    audioContext = new AudioContextClass();
+  }
+  return audioContext;
+}
+
+/* Memuat SoundFont piano jika internet tersedia.
+   Piano sintetis tetap berfungsi jika pemuatan gagal. */
+async function activateAudio(){
+  try{
+    const ctx = getAudioContext();
+
+    if(ctx.state === "suspended"){
+      await ctx.resume();
+    }
+
+    if(!soundfontInstrument &&
+       !soundfontLoading &&
+       window.Soundfont){
+      soundfontLoading = true;
+      setStatus("Memuat suara piano...");
+
+      try{
+        soundfontInstrument = await Soundfont.instrument(
+          ctx,
+          "acoustic_grand_piano"
+        );
+      }catch(error){
+        console.warn("SoundFont gagal dimuat:", error);
+      }
+
+      soundfontLoading = false;
+    }
+
+    setStatus(
+      soundfontInstrument
+        ? "Suara piano siap."
+        : "Suara piano sintetis siap."
+    );
+
+    return true;
+  }catch(error){
+    setStatus("Audio gagal: " + error.message);
+    alert(error.message);
+    return false;
+  }
+}
+
+function playSynthetic(midi){
+  const ctx = getAudioContext();
+  const oscillator = ctx.createOscillator();
+  const gain = ctx.createGain();
+
+  oscillator.type = "triangle";
+  oscillator.frequency.value = midiToFrequency(midi);
+
+  const now = ctx.currentTime;
+  gain.gain.setValueAtTime(0.0001, now);
+  gain.gain.exponentialRampToValueAtTime(0.18, now + 0.02);
+  gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.8);
+
+  oscillator.connect(gain);
+  gain.connect(ctx.destination);
+  oscillator.start(now);
+  oscillator.stop(now + 0.85);
+}
+
+async function playNote(midi){
+  const ready = await activateAudio();
+  if(!ready) return;
+
+  const note = midiToName(midi);
+
+  try{
+    if(soundfontInstrument){
+      soundfontInstrument.play(note, audioContext.currentTime, {
+        gain: 0.8,
+        duration: 0.8
+      });
+    }else{
+      playSynthetic(midi);
+    }
+  }catch(error){
+    console.warn(error);
+    playSynthetic(midi);
+  }
+}
+
+function renderKeyboard(){
+  const piano = $("piano");
+  piano.innerHTML = "";
+
+  const firstMidi = Number($("octave").value) * 12 + 12;
+
+  for(let i = 0; i < 24; i++){
+    const midi = firstMidi + i;
+    const noteIndex = midi % 12;
+    const black = [1,3,6,8,10].includes(noteIndex);
+
+    const key = document.createElement("button");
+    key.type = "button";
+    key.className = "key" + (black ? " black" : "");
+    key.textContent = midiToName(midi);
+    key.setAttribute("aria-label", midiToName(midi));
+
+    key.addEventListener("click", async () => {
+      key.classList.add("active");
+      await playNote(midi);
+      setTimeout(() => key.classList.remove("active"), 180);
+
+      if($("waitMode").checked){
+        judgeNote(midi);
+      }
+    });
+
+    piano.appendChild(key);
+  }
+}
+
+function updateTarget(){
+  $("target").textContent =
+    exercise[targetIndex] || "Selesai!";
+  $("progress").textContent =
+    Math.min(targetIndex, exercise.length) +
+    " / " + exercise.length;
+}
+
+function judgeNote(midi){
+  const expected = nameToMidi(exercise[targetIndex]);
+
+  if(midi === expected){
+    $("message").textContent =
+      "Benar! " + midiToName(midi);
+
+    targetIndex = Math.min(targetIndex + 1, exercise.length);
+    updateTarget();
+  }else{
+    $("message").textContent =
+      "Belum tepat. Target: " + midiToName(expected);
+  }
+}
+
+function nextNote(){
+  targetIndex = Math.min(targetIndex + 1, exercise.length);
+  updateTarget();
+}
+
+function resetExercise(){
+  targetIndex = 0;
+  updateTarget();
+  $("message").textContent = "Latihan dimulai ulang.";
+}
+
+/* Tombol mikrofon harus meminta izin kepada pengguna.
+   Browser akan menampilkan dialog izin jika diperlukan. */
+async function activateMicrophone(){
+  if(micEnabled){
+    stopMicrophone();
+    return;
+  }
+
+  if(!navigator.mediaDevices ||
+     !navigator.mediaDevices.getUserMedia){
+    const msg =
+      "Mikrofon tidak tersedia. Buka halaman melalui HTTPS " +
+      "atau localhost, lalu coba lagi.";
+    setStatus(msg);
+    alert(msg);
+    return;
+  }
+
+  try{
+    setStatus("Menunggu izin mikrofon...");
+
+    micStream = await navigator.mediaDevices.getUserMedia({
+      audio: {
+        echoCancellation: false,
+        noiseSuppression: false,
+        autoGainControl: false
+      }
+    });
+
+    const ctx = getAudioContext();
+    if(ctx.state === "suspended") await ctx.resume();
+
+    const source = ctx.createMediaStreamSource(micStream);
+    analyser = ctx.createAnalyser();
+    analyser.fftSize = 4096;
+    analyser.smoothingTimeConstant = 0;
+
+    source.connect(analyser);
+    micBuffer = new Float32Array(analyser.fftSize);
+
+    micEnabled = true;
+    $("micButton").textContent = "Matikan mikrofon";
+    setStatus("Mikrofon aktif.");
+    detectLoop();
+
+  }catch(error){
+    stopMicrophone();
+
+    let message = "Mikrofon gagal diaktifkan: " + error.message;
+
+    if(error.name === "NotAllowedError"){
+      message =
+        "Izin mikrofon ditolak. Izinkan mikrofon di pengaturan " +
+        "situs/browser, lalu coba lagi.";
+    }else if(error.name === "NotFoundError"){
+      message = "Mikrofon tidak ditemukan pada perangkat.";
+    }else if(error.name === "NotReadableError"){
+      message =
+        "Mikrofon sedang digunakan aplikasi lain atau tidak tersedia.";
+    }
+
+    setStatus(message);
+    alert(message);
+  }
+}
+
+function stopMicrophone(){
+  micEnabled = false;
+
+  if(animationId !== null){
+    cancelAnimationFrame(animationId);
+    animationId = null;
+  }
+
+  if(micStream){
+    micStream.getTracks().forEach(track => track.stop());
+    micStream = null;
+  }
+
+  analyser = null;
+  micBuffer = null;
+  $("micButton").textContent = "Aktifkan mikrofon";
+  $("detected").textContent = "—";
+  $("frequency").textContent = "Frekuensi: —";
+}
+
+/* Autocorrelation untuk estimasi pitch */
+function detectPitch(buffer, sampleRate){
+  const length = buffer.length;
+  let mean = 0;
+  let energy = 0;
+
+  for(let i = 0; i < length; i++){
+    mean += buffer[i];
+    energy += buffer[i] * buffer[i];
+  }
+
+  mean /= length;
+  const rms = Math.sqrt(energy / length);
+
+  if(rms < 0.012) return null;
+
+  const data = new Float32Array(length);
+  for(let i = 0; i < length; i++){
+    data[i] = buffer[i] - mean;
+  }
+
+  let bestLag = -1;
+  let bestCorrelation = 0;
+
+  const minLag = Math.floor(sampleRate / 1000);
+  const maxLag = Math.min(
+    Math.floor(sampleRate / 65),
+    length - 2
+  );
+
+  for(let lag = minLag; lag <= maxLag; lag++){
+    let sum = 0;
+    const n = length - lag;
+
+    for(let i = 0; i < n; i++){
+      sum += data[i] * data[i + lag];
+    }
+
+    const correlation = sum / n;
+
+    if(correlation > bestCorrelation){
+      bestCorrelation = correlation;
+      bestLag = lag;
+    }
+  }
+
+  if(bestLag < 0 || bestCorrelation < 0.15) return null;
+
+  const frequency = sampleRate / bestLag;
+
+  if(frequency < 65 || frequency > 1000) return null;
+
+  return {
+    frequency,
+    quality: bestCorrelation
+  };
+}
+
+function detectLoop(){
+  if(!micEnabled || !analyser) return;
+
+  analyser.getFloatTimeDomainData(micBuffer);
+
+  const result = detectPitch(
+    micBuffer,
+    audioContext.sampleRate
+  );
+
+  if(result){
+    let midi = Math.round(
+      69 + 12 * Math.log2(result.frequency / 440)
+    );
+
+    const expected = nameToMidi(exercise[targetIndex]);
+
+    /* Koreksi oktaf hanya jika hasilnya berbeda satu oktaf
+       dari target latihan dan target memang cocok. */
+    const candidates = [midi - 12, midi, midi + 12];
+    candidates.sort(
+      (a,b) => Math.abs(a - expected) - Math.abs(b - expected)
+    );
+
+    if(Math.abs(candidates[0] - expected) <
+       Math.abs(midi - expected)){
+      midi = candidates[0];
+    }
+
+    $("detected").textContent = midiToName(midi);
+    $("frequency").textContent =
+      "Frekuensi: " + result.frequency.toFixed(1) + " Hz";
+
+    if(result.quality > 0.75 && midi === lastDetectedMidi){
+      stableFrames++;
+    }else{
+      stableFrames = 0;
+    }
+
+    lastDetectedMidi = midi;
+
+    if(stableFrames >= 5 && Date.now() - lastAccepted > 700){
+      lastAccepted = Date.now();
+      stableFrames = 0;
+
+      if($("waitMode").checked){
+        judgeNote(midi);
+      }
+    }
+  }else{
+    $("detected").textContent = "—";
+    $("frequency").textContent = "Frekuensi: —";
+    stableFrames = 0;
+    lastDetectedMidi = null;
+  }
+
+  animationId = requestAnimationFrame(detectLoop);
+}
+
+$("audioButton").addEventListener("click", activateAudio);
+$("micButton").addEventListener("click", activateMicrophone);
+$("nextButton").addEventListener("click", nextNote);
+$("resetButton").addEventListener("click", resetExercise);
+$("octave").addEventListener("change", renderKeyboard);
+
+renderKeyboard();
+updateTarget();
+</script>
+
+<!-- SoundFont piano eksternal; jika gagal, piano sintetis tetap tersedia. -->
+<script
+ src="https://cdn.jsdelivr.net/npm/soundfont-player@0.12.0/dist/soundfont-player.min.js">
+</script>
+</body>
+</html>
+akeAudio(){
  if(!state.audio){
   const AC=window.AudioContext||window.webkitAudioContext;
   if(!AC) throw new Error("Browser ini tidak mendukung Web Audio API.");
