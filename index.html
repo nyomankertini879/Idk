@@ -1,15 +1,14 @@
+```html
 <!DOCTYPE html>
 <html lang="id" class="h-full bg-slate-950 text-slate-100 select-none">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Piano Maestro - Undertale Simply Piano Edition</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Piano Maestro Mobile - Undertale Edition</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- VexFlow for Real Sheet Music Rendering -->
-    <script src="https://cdn.jsdelivr.net/npm/vexflow@4.2.2/build/cjs/vexflow.js"></script>
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -22,16 +21,6 @@
                     fontFamily: {
                         sans: ['Outfit', 'sans-serif'],
                         pixel: ['"Press Start 2P"', 'monospace'],
-                    },
-                    colors: {
-                        undertale: {
-                            red: '#ff0000',
-                            yellow: '#ffff00',
-                            cyan: '#00ffff',
-                            green: '#00ff00',
-                            purple: '#b026ff',
-                            orange: '#ffaa00'
-                        }
                     }
                 }
             }
@@ -39,295 +28,202 @@
     </script>
 
     <style>
-        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body { touch-action: manipulation; overflow: hidden; }
+
+        ::-webkit-scrollbar { width: 4px; height: 4px; }
         ::-webkit-scrollbar-track { background: rgba(15, 23, 42, 0.8); }
         ::-webkit-scrollbar-thumb { background: rgba(139, 92, 246, 0.5); border-radius: 9999px; }
-        ::-webkit-scrollbar-thumb:hover { background: rgba(139, 92, 246, 0.8); }
 
         .key-active-correct {
             background: linear-gradient(to bottom, #10b981, #059669) !important;
-            box-shadow: 0 0 22px #10b981 !important;
+            box-shadow: 0 0 15px #10b981 !important;
             color: white !important;
         }
 
         .key-active-wrong {
             background: linear-gradient(to bottom, #ef4444, #dc2626) !important;
-            box-shadow: 0 0 22px #ef4444 !important;
+            box-shadow: 0 0 15px #ef4444 !important;
             color: white !important;
         }
 
         .soul-heart {
             display: inline-block;
-            width: 16px;
-            height: 16px;
+            width: 14px;
+            height: 14px;
             background-color: #ff0000;
             clip-path: polygon(50% 0%, 100% 38%, 82% 100%, 50% 75%, 18% 100%, 0% 38%);
         }
 
         @keyframes soulPulse {
             0% { transform: scale(1); filter: drop-shadow(0 0 2px #ff0000); }
-            50% { transform: scale(1.25); filter: drop-shadow(0 0 8px #ff0000); }
+            50% { transform: scale(1.2); filter: drop-shadow(0 0 6px #ff0000); }
             100% { transform: scale(1); filter: drop-shadow(0 0 2px #ff0000); }
         }
         .animate-soul { animation: soulPulse 1.2s infinite ease-in-out; }
     </style>
 </head>
-<body class="h-full flex flex-col justify-between overflow-hidden bg-slate-950 text-slate-100 font-sans">
+<body class="h-[100dvh] flex flex-col justify-between bg-slate-950 text-slate-100 font-sans overflow-hidden">
 
-    <!-- INITIAL START & NATIVE MIC PROMPT MODAL -->
-    <div id="startOverlay" class="fixed inset-0 z-50 bg-slate-950/95 backdrop-blur-md flex flex-col items-center justify-center p-6 text-center">
-        <div class="max-w-xl w-full bg-slate-900 border-2 border-purple-500/50 rounded-2xl p-8 shadow-2xl space-y-6 relative overflow-hidden">
-            <div class="absolute -top-10 -right-10 w-40 h-40 bg-purple-600/20 rounded-full blur-3xl pointer-events-none"></div>
-            
-            <div class="flex justify-center items-center space-x-3">
+    <!-- INITIAL START & NATIVE MIC PERMISSION MODAL -->
+    <div id="startOverlay" class="fixed inset-0 z-50 bg-slate-950/95 backdrop-blur-md flex flex-col items-center justify-center p-4 text-center overflow-y-auto">
+        <div class="max-w-md w-full bg-slate-900 border border-purple-500/50 rounded-2xl p-5 shadow-2xl space-y-4 relative">
+            <div class="flex justify-center items-center space-x-2">
                 <span class="soul-heart animate-soul"></span>
-                <h1 class="text-3xl font-black tracking-wider bg-gradient-to-r from-purple-400 via-pink-400 to-cyan-400 bg-clip-text text-transparent">
-                    SIMPLY PIANO
+                <h1 class="text-xl font-black tracking-wider bg-gradient-to-r from-purple-400 via-pink-400 to-cyan-400 bg-clip-text text-transparent">
+                    PIANO MAESTRO MOBILE
                 </h1>
                 <span class="soul-heart animate-soul"></span>
             </div>
-            <p class="text-xs font-pixel text-undertale-yellow">UNDERTALE SPECIAL SONGS EDITION</p>
+            <p class="text-[10px] font-pixel text-yellow-400">UNDERTALE LANDSCAPE EDITION</p>
             
-            <p class="text-slate-300 text-sm leading-relaxed">
-                Platform latihan piano interaktif dengan <strong>Pitch Detection Mikrofon Real-time</strong>. Aplikasi akan meminta <strong>Izin Akses Mikrofon Browser</strong> secara langsung agar dapat mendeteksi nada piano fisik Anda.
+            <p class="text-slate-300 text-xs leading-relaxed">
+                Dirancang khusus untuk layar HP dalam posisi <strong>Landscape</strong> di atas stand piano. Aplikasi meminta izin mikrofon agar dapat mendeteksi nada piano asli Anda secara real-time.
             </p>
 
-            <!-- Songs List Preview -->
-            <div class="grid grid-cols-2 gap-2 text-left text-xs bg-slate-950 p-3 rounded-xl border border-slate-800">
-                <div class="flex items-center space-x-2 text-slate-200">
-                    <i class="fa-solid fa-music text-purple-400"></i>
-                    <span>Finale (♩=190)</span>
-                </div>
-                <div class="flex items-center space-x-2 text-slate-200">
-                    <i class="fa-solid fa-crown text-amber-400"></i>
-                    <span>Asgore (♩=145)</span>
-                </div>
-                <div class="flex items-center space-x-2 text-slate-200">
-                    <i class="fa-solid fa-face-smile text-cyan-400"></i>
-                    <span>Your Best Friend (♩=125)</span>
-                </div>
-                <div class="flex items-center space-x-2 text-slate-200">
-                    <i class="fa-solid fa-skull text-rose-400"></i>
-                    <span>Megalovania (♩=120)</span>
-                </div>
+            <div class="grid grid-cols-2 gap-1.5 text-left text-[11px] bg-slate-950 p-2.5 rounded-xl border border-slate-800">
+                <div class="text-slate-200"><i class="fa-solid fa-music text-purple-400 mr-1"></i> Finale</div>
+                <div class="text-slate-200"><i class="fa-solid fa-crown text-amber-400 mr-1"></i> Asgore</div>
+                <div class="text-slate-200"><i class="fa-solid fa-face-smile text-cyan-400 mr-1"></i> Your Best Friend</div>
+                <div class="text-slate-200"><i class="fa-solid fa-skull text-rose-400 mr-1"></i> Megalovania</div>
             </div>
 
-            <button onclick="requestNativeMicAndStart()" class="w-full py-4 bg-gradient-to-r from-purple-600 via-pink-600 to-cyan-500 hover:from-purple-500 hover:to-cyan-400 text-white font-extrabold text-base rounded-xl shadow-lg shadow-purple-500/30 transition-all hover:scale-[1.02] active:scale-95 flex items-center justify-center space-x-2">
+            <button onclick="requestNativeMicAndStart()" class="w-full py-3 bg-gradient-to-r from-purple-600 via-pink-600 to-cyan-500 text-white font-extrabold text-sm rounded-xl shadow-lg shadow-purple-500/30 flex items-center justify-center space-x-2 active:scale-95 transition-all">
                 <i class="fa-solid fa-microphone"></i>
                 <span>IZINKAN MIKROFON & MULAI</span>
             </button>
-            <p class="text-[11px] text-slate-500">Anda juga dapat memilih untuk lanjut menggunakan Keyboard PC / MIDI jika mikrofon ditolak.</p>
+            <p class="text-[10px] text-slate-500">Putar HP Anda ke posisi horizontal (landscape) untuk pengalaman terbaik.</p>
         </div>
     </div>
 
-    <!-- MIC SETUP & CALIBRATION MODAL -->
-    <div id="micSetupModal" class="fixed inset-0 z-40 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4 opacity-0 pointer-events-none transition-opacity duration-300">
-        <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-5">
-            <div class="flex justify-between items-center border-b border-slate-800 pb-3">
-                <h3 class="font-bold text-slate-100 flex items-center space-x-2">
+    <!-- MIC SETUP MODAL -->
+    <div id="micSetupModal" class="fixed inset-0 z-40 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-3 opacity-0 pointer-events-none transition-opacity duration-300">
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-sm w-full p-4 shadow-2xl space-y-3">
+            <div class="flex justify-between items-center border-b border-slate-800 pb-2">
+                <h3 class="font-bold text-slate-100 text-xs flex items-center space-x-2">
                     <i class="fa-solid fa-microphone text-purple-400"></i>
-                    <span>Status & Kalibrasi Mikrofon</span>
+                    <span>Kalibrasi & Status Mikrofon</span>
                 </h3>
                 <button onclick="closeMicModal()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
             </div>
 
-            <p class="text-xs text-slate-300 leading-relaxed">
-                Pendeteksi audio menggunakan mikrofon untuk membaca frekuensi instrumen Anda.
-            </p>
-
-            <!-- Real-time VU Meter -->
-            <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-2">
-                <div class="flex justify-between text-xs text-slate-400">
-                    <span>Sensitivitas Input (VU Meter):</span>
+            <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 space-y-1.5">
+                <div class="flex justify-between text-[11px] text-slate-400">
+                    <span>Input Level (VU):</span>
                     <span id="vuLevelText" class="font-mono text-cyan-400">0%</span>
                 </div>
-                <div class="w-full h-3 bg-slate-800 rounded-full overflow-hidden p-0.5">
-                    <div id="vuBar" class="h-full bg-gradient-to-r from-emerald-500 via-amber-400 to-rose-500 rounded-full w-0 transition-all duration-75"></div>
-                </div>
-                <div class="flex justify-between text-[10px] text-slate-500 pt-1">
-                    <span>Threshold Kebisingan</span>
-                    <span id="noiseFloorVal">Gate: 0.015</span>
+                <div class="w-full h-2.5 bg-slate-800 rounded-full overflow-hidden p-0.5">
+                    <div id="vuBar" class="h-full bg-gradient-to-r from-emerald-500 to-rose-500 rounded-full w-0 transition-all duration-75"></div>
                 </div>
             </div>
 
-            <div class="space-y-3">
-                <button onclick="triggerMicPermission()" class="w-full py-3 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl text-xs flex items-center justify-center space-x-2 transition-all">
+            <div class="space-y-2">
+                <button onclick="triggerMicPermission()" class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl text-xs flex items-center justify-center space-x-1.5">
                     <i class="fa-solid fa-plug-circle-check"></i>
-                    <span>Minta Ulang Izin Mikrofon Browser</span>
+                    <span>Minta Ulang Izin Mikrofon</span>
                 </button>
-
-                <button onclick="autoCalibrateNoise()" class="w-full py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold rounded-xl text-xs border border-slate-700 flex items-center justify-center space-x-2">
-                    <i class="fa-solid fa-sliders"></i>
-                    <span>Kalibrasi Kebisingan Ruangan (Auto)</span>
+                <button onclick="autoCalibrateNoise()" class="w-full py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold rounded-xl text-[11px] border border-slate-700">
+                    Kalibrasi Kebisingan Auto
                 </button>
             </div>
-
-            <div id="micStatusAlert" class="hidden p-3 rounded-xl bg-rose-950/80 border border-rose-800 text-rose-300 text-xs">
+            <div id="micStatusAlert" class="hidden p-2.5 rounded-lg bg-rose-950/80 border border-rose-800 text-rose-300 text-[11px]">
                 <i class="fa-solid fa-triangle-exclamation mr-1"></i>
-                <span id="micAlertText">Akses mikrofon belum diberikan. Gunakan tombol di atas untuk mengaktifkan.</span>
+                <span id="micAlertText">Akses mikrofon belum diberikan.</span>
             </div>
         </div>
     </div>
 
-    <!-- TOP HEADER / NAV BAR -->
-    <header class="bg-slate-900/90 backdrop-blur border-b border-slate-800 px-4 py-2.5 flex items-center justify-between z-20">
-        <div class="flex items-center space-x-3">
-            <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-purple-600 to-cyan-400 flex items-center justify-center text-white shadow-md shadow-purple-500/20">
-                <i class="fa-solid fa-music text-lg"></i>
-            </div>
-            <div>
-                <h1 class="text-lg font-black tracking-wide bg-gradient-to-r from-purple-400 via-pink-400 to-cyan-400 bg-clip-text text-transparent flex items-center space-x-2">
-                    <span>PIANO MAESTRO</span>
-                    <span class="text-[10px] px-1.5 py-0.5 rounded bg-purple-950 text-purple-300 border border-purple-800 font-pixel">SIMPLY</span>
-                </h1>
-            </div>
-        </div>
-
-        <!-- SONG SELECTOR DROPDOWN -->
+    <!-- MOBILE LANDSCAPE COMPACT HEADER -->
+    <header class="bg-slate-900/90 backdrop-blur border-b border-slate-800 px-3 py-1.5 flex items-center justify-between z-20 text-xs">
+        <!-- SONG SELECTOR -->
         <div class="flex items-center space-x-2">
-            <span class="text-xs text-slate-400 hidden md:inline">Lagu:</span>
-            <select id="songSelect" onchange="changeSong(this.value)" class="bg-slate-950 text-purple-300 border border-slate-800 rounded-xl px-3 py-1.5 text-xs font-bold focus:outline-none focus:border-purple-500 cursor-pointer">
-                <option value="finale">1. Finale (Undertale)</option>
-                <option value="asgore">2. Asgore (Undertale)</option>
-                <option value="best_friend">3. Your Best Friend (Undertale)</option>
-                <option value="megalovania">4. Megalovania (Undertale)</option>
+            <select id="songSelect" onchange="changeSong(this.value)" class="bg-slate-950 text-purple-300 border border-slate-800 rounded-lg px-2 py-1 text-xs font-bold focus:outline-none">
+                <option value="finale">Finale (Undertale)</option>
+                <option value="asgore">Asgore (Undertale)</option>
+                <option value="best_friend">Your Best Friend</option>
+                <option value="megalovania">Megalovania</option>
             </select>
         </div>
 
-        <!-- CENTER SCORE & ACCURACY STATS -->
-        <div class="flex items-center space-x-3 sm:space-x-4">
-            <!-- Mode Selector -->
-            <div class="bg-slate-950 p-1 rounded-xl border border-slate-800 flex text-xs font-semibold">
-                <button id="modeWaitBtn" onclick="setPlayMode('wait')" class="px-3 py-1.5 rounded-lg transition-all bg-purple-600 text-white shadow">
-                    <i class="fa-solid fa-hand-paper mr-1"></i> Wait Mode
-                </button>
-                <button id="modePlayBtn" onclick="setPlayMode('play')" class="px-3 py-1.5 rounded-lg transition-all text-slate-400 hover:text-slate-200">
-                    <i class="fa-solid fa-play mr-1"></i> Flow Mode
-                </button>
+        <!-- MODE & STATS -->
+        <div class="flex items-center space-x-2">
+            <div class="bg-slate-950 p-0.5 rounded-lg border border-slate-800 flex text-[10px]">
+                <button id="modeWaitBtn" onclick="setPlayMode('wait')" class="px-2 py-1 rounded bg-purple-600 text-white font-bold">Wait</button>
+                <button id="modePlayBtn" onclick="setPlayMode('play')" class="px-2 py-1 rounded text-slate-400">Flow</button>
             </div>
 
-            <!-- Stats -->
-            <div class="hidden lg:flex items-center space-x-4 bg-slate-950 px-4 py-1 rounded-xl border border-slate-800 font-mono text-xs">
-                <div>
-                    <span class="text-slate-500 uppercase text-[9px] block">Score</span>
-                    <span id="scoreDisplay" class="font-extrabold text-cyan-400 text-sm">0</span>
-                </div>
-                <div class="h-5 w-px bg-slate-800"></div>
-                <div>
-                    <span class="text-slate-500 uppercase text-[9px] block">Combo</span>
-                    <span id="comboDisplay" class="font-extrabold text-amber-400 text-sm">0x</span>
-                </div>
-                <div class="h-5 w-px bg-slate-800"></div>
-                <div>
-                    <span class="text-slate-500 uppercase text-[9px] block">Accuracy</span>
-                    <span id="accuracyDisplay" class="font-extrabold text-emerald-400 text-sm">100%</span>
-                </div>
+            <!-- Compact Score -->
+            <div class="hidden sm:flex items-center space-x-2 bg-slate-950 px-2 py-1 rounded-lg border border-slate-800 font-mono text-[11px]">
+                <span class="text-cyan-400 font-bold" id="scoreDisplay">0</span>
+                <span class="text-amber-400 font-bold" id="comboDisplay">0x</span>
             </div>
         </div>
 
-        <!-- RIGHT CONTROLS -->
-        <div class="flex items-center space-x-2">
-            <!-- Visualizer View Toggle -->
-            <button onclick="toggleVisualizerView()" class="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 text-xs font-semibold flex items-center space-x-1.5 transition-all">
-                <i class="fa-solid fa-sliders text-purple-400"></i>
-                <span id="viewToggleLabel" class="hidden sm:inline">Modus: Synthesia</span>
-            </button>
-
-            <!-- Mic Config Modal Trigger -->
-            <button onclick="openMicModal()" class="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 text-xs font-semibold flex items-center space-x-1.5 transition-all">
+        <!-- RIGHT ACTIONS -->
+        <div class="flex items-center space-x-1.5">
+            <button onclick="openMicModal()" class="px-2.5 py-1 rounded-lg bg-slate-800 text-slate-300 border border-slate-700 text-xs flex items-center space-x-1">
                 <i id="micHeaderIcon" class="fa-solid fa-microphone-slash text-rose-400"></i>
-                <span id="micHeaderStatus" class="hidden sm:inline">Mic Setup</span>
+                <span class="hidden md:inline">Mic</span>
             </button>
         </div>
     </header>
 
-    <!-- LIVE AUDIO & PITCH DETECTION STATUS BAR -->
-    <div class="bg-slate-900/80 border-b border-slate-800/80 px-4 py-1.5 flex items-center justify-between text-xs font-mono">
-        <div class="flex items-center space-x-4">
-            <span class="text-slate-400 flex items-center">
-                <span id="micLiveDot" class="w-2 h-2 rounded-full bg-slate-600 mr-2"></span>
-                Detected Pitch: <b id="detectedNoteText" class="text-purple-400 ml-1">---</b>
-            </span>
+    <!-- LIVE PITCH BAR -->
+    <div class="bg-slate-900/60 border-b border-slate-800/60 px-3 py-1 flex items-center justify-between text-[11px] font-mono">
+        <div class="flex items-center space-x-2">
+            <span class="w-2 h-2 rounded-full bg-slate-600" id="micLiveDot"></span>
+            <span class="text-slate-400">Note: <b id="detectedNoteText" class="text-purple-400">---</b></span>
             <span class="text-slate-600">|</span>
-            <span class="text-slate-400 hidden sm:inline">Freq: <b id="detectedFreqText" class="text-cyan-400">0.0 Hz</b></span>
-            <span id="centsOffsetDisplay" class="hidden md:inline text-[10px] px-1.5 py-0.5 rounded bg-slate-800 text-slate-400">0 cents</span>
+            <span class="text-slate-400 hidden sm:inline">Freq: <b id="detectedFreqText" class="text-cyan-400">0 Hz</b></span>
         </div>
-
-        <!-- Song Tempo Control -->
-        <div class="flex items-center space-x-3">
-            <span class="text-slate-400 text-xs hidden sm:inline">BPM Speed:</span>
-            <input type="range" id="bpmSlider" min="50" max="100" value="100" class="w-20 accent-purple-500 cursor-pointer" oninput="updateBPM(this.value)">
-            <span id="bpmValue" class="text-purple-300 w-16 text-xs">100%</span>
+        <div class="flex items-center space-x-2">
+            <span class="text-slate-400 text-[10px]">BPM:</span>
+            <input type="range" id="bpmSlider" min="50" max="100" value="100" class="w-16 accent-purple-500" oninput="updateBPM(this.value)">
+            <span id="bpmValue" class="text-purple-300 text-[10px]">100%</span>
         </div>
     </div>
 
-    <!-- MAIN DISPLAY AREA (SYNTHESIZER CANVAS OR VEXFLOW SHEET MUSIC) -->
+    <!-- MAIN SYNTHESIA FALLING NOTES CANVAS AREA -->
     <main class="relative flex-1 bg-slate-950 flex flex-col items-center justify-center overflow-hidden">
-        
-        <!-- Background Undertale Grid -->
-        <div class="absolute inset-0 opacity-10 bg-[radial-gradient(#8b5cf6_1px,transparent_1px)] [background-size:20px_20px] pointer-events-none"></div>
+        <div class="absolute inset-0 opacity-10 bg-[radial-gradient(#8b5cf6_1px,transparent_1px)] [background-size:16px_16px] pointer-events-none"></div>
 
-        <!-- Synthesia Falling Bar Canvas -->
+        <!-- Falling Canvas -->
         <canvas id="fallingCanvas" class="w-full h-full block absolute inset-0 z-0"></canvas>
 
-        <!-- VexFlow Sheet Music Container -->
-        <div id="sheetMusicContainer" class="hidden absolute inset-0 bg-slate-900/90 backdrop-blur-md p-4 overflow-auto flex-col items-center justify-center z-10">
-            <div class="bg-slate-100 text-slate-900 p-6 rounded-2xl shadow-2xl border-4 border-slate-800 max-w-4xl w-full">
-                <div class="flex justify-between items-center border-b pb-2 mb-2 font-serif">
-                    <div>
-                        <h2 id="sheetTitle" class="text-xl font-bold tracking-wide">"Finale"</h2>
-                        <p class="text-xs text-slate-600">Undertale - Composed by Toby Fox</p>
-                    </div>
-                    <div class="text-right text-xs text-slate-600">
-                        <p id="sheetBpm">♩ = 190</p>
-                        <p id="sheetKey">Key: A♭ Major</p>
-                    </div>
-                </div>
-                <div id="vexflowOutput" class="w-full flex justify-center overflow-x-auto"></div>
-            </div>
-        </div>
-
-        <!-- TARGET NOTE BANNER (WAIT MODE) -->
-        <div id="waitBanner" class="absolute top-6 left-1/2 transform -translate-x-1/2 bg-purple-900/90 backdrop-blur-md border border-purple-500/50 text-purple-100 px-6 py-2.5 rounded-full text-sm font-semibold shadow-2xl flex items-center space-x-3 pointer-events-none transition-all duration-300 z-10">
+        <!-- TARGET NOTE BANNER -->
+        <div id="waitBanner" class="absolute top-2 left-1/2 transform -translate-x-1/2 bg-purple-900/90 backdrop-blur-md border border-purple-500/50 text-purple-100 px-4 py-1 rounded-full text-xs font-semibold shadow-xl flex items-center space-x-2 z-10 pointer-events-none">
             <i class="fa-solid fa-hand-pointer text-amber-300 animate-bounce"></i>
-            <span>Mainkan nada: <strong id="targetNoteName" class="text-amber-300 text-lg font-bold underline font-mono">Ab4</strong></span>
+            <span>Mainkan: <strong id="targetNoteName" class="text-amber-300 font-bold font-mono">Ab4</strong></span>
         </div>
 
-        <!-- PERFECT / MISS FEEDBACK -->
-        <div id="feedbackText" class="absolute top-1/3 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-3xl md:text-5xl font-extrabold tracking-wider pointer-events-none transition-all duration-200 opacity-0 z-20 text-center">
+        <!-- FEEDBACK POPUP -->
+        <div id="feedbackText" class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-2xl md:text-4xl font-extrabold tracking-wider pointer-events-none transition-all duration-200 opacity-0 z-20 text-center">
             PERFECT!
         </div>
     </main>
 
-    <!-- BOTTOM VIRTUAL PIANO KEYBOARD -->
-    <footer class="bg-slate-900 border-t border-slate-800 p-2 sm:p-3 relative z-20">
-        <div class="flex items-center justify-between max-w-6xl mx-auto mb-1.5 px-1 text-xs text-slate-400">
-            <div class="flex items-center space-x-2">
-                <span>Rentang Piano:</span>
-                <button onclick="shiftOctave(-1)" class="px-2 py-0.5 bg-slate-800 hover:bg-slate-700 rounded text-slate-200"><i class="fa-solid fa-chevron-left"></i> Down</button>
-                <span id="octaveRangeText" class="font-mono text-purple-300">C3 - C6</span>
-                <button onclick="shiftOctave(1)" class="px-2 py-0.5 bg-slate-800 hover:bg-slate-700 rounded text-slate-200">Up <i class="fa-solid fa-chevron-right"></i></button>
+    <!-- MOBILE LANDSCAPE OPTIMIZED VIRTUAL PIANO KEYBOARD -->
+    <footer class="bg-slate-900 border-t border-slate-800 p-1.5 relative z-20">
+        <div class="flex items-center justify-between max-w-4xl mx-auto mb-1 px-1 text-[10px] text-slate-400">
+            <div class="flex items-center space-x-1.5">
+                <span>Octave:</span>
+                <button onclick="shiftOctave(-1)" class="px-1.5 py-0.5 bg-slate-800 rounded text-slate-200"><i class="fa-solid fa-chevron-left"></i></button>
+                <span id="octaveRangeText" class="font-mono text-purple-300">C4 - C6</span>
+                <button onclick="shiftOctave(1)" class="px-1.5 py-0.5 bg-slate-800 rounded text-slate-200"><i class="fa-solid fa-chevron-right"></i></button>
             </div>
-            
-            <div class="flex items-center space-x-4">
-                <label class="flex items-center space-x-1 cursor-pointer">
-                    <input type="checkbox" id="showLabelsToggle" checked onchange="toggleLabels(this.checked)" class="accent-purple-500 rounded">
-                    <span>Label Tuts</span>
-                </label>
-                <span class="hidden md:inline text-slate-500">MIDI: <span id="midiDeviceText" class="text-slate-400">Terhubung</span></span>
-            </div>
+            <label class="flex items-center space-x-1 cursor-pointer">
+                <input type="checkbox" id="showLabelsToggle" checked onchange="toggleLabels(this.checked)" class="accent-purple-500 rounded">
+                <span>Label</span>
+            </label>
         </div>
 
-        <div class="max-w-6xl mx-auto relative flex justify-center h-32 sm:h-40 md:h-44 rounded-xl overflow-hidden bg-slate-950 p-1 shadow-2xl border border-slate-800" id="pianoContainer">
-            <!-- Dynamically populated piano keys -->
+        <div class="max-w-4xl mx-auto relative flex justify-center h-28 sm:h-32 rounded-xl overflow-hidden bg-slate-950 p-0.5 shadow-2xl border border-slate-800" id="pianoContainer">
+            <!-- Dynamically populated keys -->
         </div>
     </footer>
 
     <!-- LOGIC SCRIPT -->
     <script>
-        /* ==========================================================================
-           1. SONGS DATABASE (FINALE, ASGORE, YOUR BEST FRIEND, MEGALOVANIA)
-           ========================================================================== */
         const SONGS = {
             finale: {
                 id: 'finale',
@@ -400,7 +296,6 @@
                 const flats = { 'Db': 'C#', 'Eb': 'D#', 'Gb': 'F#', 'Ab': 'G#', 'Bb': 'A#' };
                 if (flats[noteName]) normalized = flats[noteName] + oct;
             }
-
             const regex = /^([A-G]#?)(-?\d+)$/;
             const match = normalized.match(regex);
             if (!match) return 60;
@@ -416,24 +311,9 @@
             const cents = Math.floor(1200 * Math.log2(freq / exactFreq));
             const noteIndex = (midi % 12 + 12) % 12;
             const octave = Math.floor(midi / 12) - 1;
-
-            return {
-                name: NOTE_NAMES[noteIndex] + octave,
-                midi: midi,
-                freq: freq,
-                cents: cents
-            };
+            return { name: NOTE_NAMES[noteIndex] + octave, midi: midi, freq: freq, cents: cents };
         }
 
-        const PC_KEYBOARD_MAP = {
-            'a': 'C4', 'w': 'C#4', 's': 'D4', 'e': 'D#4', 'd': 'E4',
-            'f': 'F4', 't': 'F#4', 'g': 'G4', 'y': 'G#4', 'h': 'A4',
-            'u': 'A#4', 'j': 'B4', 'k': 'C5', 'o': 'C#5', 'l': 'D5'
-        };
-
-        /* ==========================================================================
-           2. APP STATE MANAGEMENT
-           ========================================================================== */
         let audioCtx = null;
         let micStream = null;
         let micAnalyser = null;
@@ -441,10 +321,9 @@
         let noiseFloorThreshold = 0.015;
 
         let playMode = 'wait';
-        let visualizerView = 'synthesia';
         let bpmMultiplier = 1.0;
-        let startOctave = 3;
-        let totalKeysToRender = 37;
+        let startOctave = 4;
+        let totalKeysToRender = 25; // 2 octaves fit nicely on mobile landscape
 
         let currentSongKey = 'finale';
         let activeNoteIndex = 0;
@@ -459,9 +338,6 @@
 
         let fallingCanvas, fallingCtx;
 
-        /* ==========================================================================
-           3. INITIALIZATION & NATIVE MIC PERMISSION
-           ========================================================================== */
         async function requestNativeMicAndStart() {
             document.getElementById('startOverlay').classList.add('hidden');
             initAudioContext();
@@ -473,9 +349,6 @@
             window.addEventListener('resize', resizeCanvas);
 
             renderPianoKeys();
-            setupKeyboardListeners();
-            setupWebMIDI();
-
             await triggerMicPermission();
 
             loadSong(currentSongKey);
@@ -498,565 +371,17 @@
                 alertBox.classList.add('hidden');
 
                 document.getElementById('micHeaderIcon').className = 'fa-solid fa-microphone text-emerald-400 animate-pulse';
-                document.getElementById('micHeaderStatus').innerText = 'Mic Active';
-                document.getElementById('micLiveDot').className = 'w-2 h-2 rounded-full bg-emerald-400 mr-2 animate-ping';
+                document.getElementById('micLiveDot').className = 'w-2 h-2 rounded-full bg-emerald-400 animate-ping';
 
                 processPitchDetection();
                 closeMicModal();
             } catch (err) {
-                console.warn("Microphone permission denied or unavailable:", err);
+                console.warn("Microphone permission denied:", err);
                 alertBox.classList.remove('hidden');
-                alertText.innerText = "Izin mikrofon tidak diberikan. Anda tetap bisa berlatih menggunakan Keyboard PC atau MIDI.";
+                alertText.innerText = "Izin mikrofon tidak diberikan. Anda tetap bisa menggunakan keyboard virtual.";
             }
         }
 
         function initAudioContext() {
-            if (!audioCtx) {
-                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            }
-            if (audioCtx.state === 'suspended') {
-                audioCtx.resume();
-            }
-        }
-
-        function resizeCanvas() {
-            if (!fallingCanvas) return;
-            const container = fallingCanvas.parentElement;
-            fallingCanvas.width = container.clientWidth;
-            fallingCanvas.height = container.clientHeight;
-        }
-
-        /* ==========================================================================
-           4. PIANO KEYBOARD BUILDER
-           ========================================================================== */
-        function renderPianoKeys() {
-            const pianoContainer = document.getElementById('pianoContainer');
-            pianoContainer.innerHTML = '';
-
-            const startMidi = (startOctave + 1) * 12;
-            const endMidi = startMidi + totalKeysToRender;
-
-            let whiteKeyCount = 0;
-            for (let m = startMidi; m < endMidi; m++) {
-                if (![1, 3, 6, 8, 10].includes(m % 12)) whiteKeyCount++;
-            }
-
-            const whiteKeyWidthPercent = 100 / whiteKeyCount;
-            let currentWhiteIndex = 0;
-
-            for (let midi = startMidi; midi < endMidi; midi++) {
-                const noteIndex = midi % 12;
-                const noteName = NOTE_NAMES[noteIndex] + (Math.floor(midi / 12) - 1);
-                const isBlack = [1, 3, 6, 8, 10].includes(noteIndex);
-
-                const keyEl = document.createElement('div');
-                keyEl.dataset.note = noteName;
-                keyEl.dataset.midi = midi;
-
-                if (!isBlack) {
-                    keyEl.className = `piano-key white-key relative border border-slate-800 bg-gradient-to-b from-slate-100 to-slate-300 rounded-b-lg flex flex-col justify-end items-center pb-2 cursor-pointer transition-all duration-75 select-none text-slate-800 font-bold text-xs shadow-md`;
-                    keyEl.style.width = `${whiteKeyWidthPercent}%`;
-                    keyEl.style.height = '100%';
-                    keyEl.style.zIndex = '1';
-
-                    const pcKey = Object.keys(PC_KEYBOARD_MAP).find(k => PC_KEYBOARD_MAP[k] === noteName);
-                    keyEl.innerHTML = `
-                        <span class="note-label ${showKeyLabels ? '' : 'hidden'} font-mono text-[10px]">${noteName}</span>
-                        ${pcKey ? `<span class="pc-key-label text-[8px] text-purple-600 bg-purple-100/90 px-1 rounded mt-0.5">${pcKey.toUpperCase()}</span>` : ''}
-                    `;
-                    currentWhiteIndex++;
-                } else {
-                    keyEl.className = `piano-key black-key absolute bg-gradient-to-b from-slate-900 via-slate-800 to-black rounded-b flex flex-col justify-end items-center pb-2 cursor-pointer transition-all duration-75 select-none text-white font-semibold text-[9px] shadow-2xl border border-slate-700`;
-                    keyEl.style.width = `${whiteKeyWidthPercent * 0.62}%`;
-                    keyEl.style.height = '62%';
-                    keyEl.style.left = `${(currentWhiteIndex - 0.31) * whiteKeyWidthPercent}%`;
-                    keyEl.style.zIndex = '2';
-
-                    const pcKey = Object.keys(PC_KEYBOARD_MAP).find(k => PC_KEYBOARD_MAP[k] === noteName);
-                    keyEl.innerHTML = `
-                        <span class="note-label ${showKeyLabels ? '' : 'hidden'} font-mono text-[8px] text-slate-300">${noteName}</span>
-                        ${pcKey ? `<span class="pc-key-label text-[7px] text-purple-300 bg-purple-900/90 px-0.5 rounded mt-0.5">${pcKey.toUpperCase()}</span>` : ''}
-                    `;
-                }
-
-                keyEl.addEventListener('mousedown', (e) => { e.preventDefault(); handleNotePlayed(noteName, 'user'); });
-                keyEl.addEventListener('touchstart', (e) => { e.preventDefault(); handleNotePlayed(noteName, 'user'); });
-
-                pianoContainer.appendChild(keyEl);
-            }
-
-            const startNoteLabel = NOTE_NAMES[startMidi % 12] + (Math.floor(startMidi / 12) - 1);
-            const endNoteLabel = NOTE_NAMES[(endMidi - 1) % 12] + (Math.floor((endMidi - 1) / 12) - 1);
-            document.getElementById('octaveRangeText').innerText = `${startNoteLabel} - ${endNoteLabel}`;
-        }
-
-        function shiftOctave(dir) {
-            const newOctave = startOctave + dir;
-            if (newOctave >= 2 && newOctave <= 5) {
-                startOctave = newOctave;
-                renderPianoKeys();
-            }
-        }
-
-        function toggleLabels(show) {
-            showKeyLabels = show;
-            document.querySelectorAll('.note-label').forEach(el => {
-                if (show) el.classList.remove('hidden');
-                else el.classList.add('hidden');
-            });
-        }
-
-        /* ==========================================================================
-           5. SYNTHESIZER SOUND ENGINE
-           ========================================================================== */
-        function playTone(freq, duration = 0.8) {
-            initAudioContext();
-            if (!audioCtx) return;
-
-            const osc = audioCtx.createOscillator();
-            const gainNode = audioCtx.createGain();
-
-            osc.type = 'triangle';
-            osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
-
-            const now = audioCtx.currentTime;
-            gainNode.gain.setValueAtTime(0, now);
-            gainNode.gain.linearRampToValueAtTime(0.35, now + 0.015);
-            gainNode.gain.exponentialRampToValueAtTime(0.0001, now + duration);
-
-            osc.connect(gainNode);
-            gainNode.connect(audioCtx.destination);
-
-            osc.start(now);
-            osc.stop(now + duration);
-        }
-
-        /* ==========================================================================
-           6. PITCH DETECTION ENGINE
-           ========================================================================== */
-        function openMicModal() {
-            document.getElementById('micSetupModal').classList.remove('opacity-0', 'pointer-events-none');
-        }
-
-        function closeMicModal() {
-            document.getElementById('micSetupModal').classList.add('opacity-0', 'pointer-events-none');
-        }
-
-        function autoCalibrateNoise() {
-            if (!micAnalyser) {
-                alert("Aktifkan izin mikrofon terlebih dahulu.");
-                return;
-            }
-            let sum = 0;
-            const buffer = new Float32Array(micAnalyser.fftSize);
-            for (let i = 0; i < 10; i++) {
-                micAnalyser.getFloatTimeDomainData(buffer);
-                let rms = 0;
-                for (let j = 0; j < buffer.length; j++) rms += buffer[j] * buffer[j];
-                sum += Math.sqrt(rms / buffer.length);
-            }
-            noiseFloorThreshold = Math.max(0.01, (sum / 10) * 1.5);
-            document.getElementById('noiseFloorVal').innerText = `Gate: ${noiseFloorThreshold.toFixed(3)}`;
-            alert(`Kalibrasi Selesai! Threshold Kebisingan Diatur ke: ${noiseFloorThreshold.toFixed(3)}`);
-        }
-
-        let lastDetectedNote = null;
-        let noteHoldCounter = 0;
-
-        function processPitchDetection() {
-            if (!isMicActive || !micAnalyser) return;
-
-            const buffer = new Float32Array(micAnalyser.fftSize);
-            micAnalyser.getFloatTimeDomainData(buffer);
-
-            let rms = 0;
-            for (let i = 0; i < buffer.length; i++) rms += buffer[i] * buffer[i];
-            rms = Math.sqrt(rms / buffer.length);
-
-            const vuPercent = Math.min(100, Math.round(rms * 500));
-            document.getElementById('vuBar').style.width = `${vuPercent}%`;
-            document.getElementById('vuLevelText').innerText = `${vuPercent}%`;
-
-            if (rms > noiseFloorThreshold) {
-                const pitch = autoCorrelate(buffer, audioCtx.sampleRate);
-                if (pitch !== -1) {
-                    const detected = freqToNote(pitch);
-                    if (detected) {
-                        document.getElementById('detectedFreqText').innerText = pitch.toFixed(1) + ' Hz';
-                        document.getElementById('detectedNoteText').innerText = detected.name;
-                        document.getElementById('centsOffsetDisplay').innerText = `${detected.cents > 0 ? '+' : ''}${detected.cents} cents`;
-
-                        if (detected.name === lastDetectedNote) {
-                            noteHoldCounter++;
-                            if (noteHoldCounter === 2) {
-                                handleNotePlayed(detected.name, 'mic');
-                            }
-                        } else {
-                            lastDetectedNote = detected.name;
-                            noteHoldCounter = 0;
-                        }
-                    }
-                }
-            } else {
-                document.getElementById('detectedNoteText').innerText = '---';
-                document.getElementById('detectedFreqText').innerText = '0.0 Hz';
-                lastDetectedNote = null;
-                noteHoldCounter = 0;
-            }
-
-            requestAnimationFrame(processPitchDetection);
-        }
-
-        function autoCorrelate(buf, sampleRate) {
-            let SIZE = buf.length;
-            let r1 = 0, r2 = SIZE - 1, thres = 0.2;
-            for (let i = 0; i < SIZE / 2; i++) {
-                if (Math.abs(buf[i]) < thres) { r1 = i; break; }
-            }
-            for (let i = 1; i < SIZE / 2; i++) {
-                if (Math.abs(buf[SIZE - i]) < thres) { r2 = SIZE - i; break; }
-            }
-
-            buf = buf.slice(r1, r2);
-            SIZE = buf.length;
-
-            let c = new Array(SIZE).fill(0);
-            for (let i = 0; i < SIZE; i++) {
-                for (let j = 0; j < SIZE - i; j++) {
-                    c[i] = c[i] + buf[j] * buf[j + i];
-                }
-            }
-
-            let d = 0;
-            while (c[d] > c[d + 1]) d++;
-
-            let maxval = -1, maxpos = -1;
-            for (let i = d; i < SIZE; i++) {
-                if (c[i] > maxval) {
-                    maxval = c[i];
-                    maxpos = i;
-                }
-            }
-
-            let T0 = maxpos;
-            let x1 = c[T0 - 1], x2 = c[T0], x3 = c[T0 + 1];
-            let a = (x1 + x3 - 2 * x2) / 2;
-            let b = (x3 - x1) / 2;
-            if (a) T0 = T0 - b / (2 * a);
-
-            return sampleRate / T0;
-        }
-
-        /* ==========================================================================
-           7. INPUT HANDLERS
-           ========================================================================== */
-        function setupKeyboardListeners() {
-            window.addEventListener('keydown', (e) => {
-                if (e.repeat) return;
-                const key = e.key.toLowerCase();
-                if (PC_KEYBOARD_MAP[key]) {
-                    handleNotePlayed(PC_KEYBOARD_MAP[key], 'user');
-                }
-            });
-        }
-
-        function setupWebMIDI() {
-            if (navigator.requestMIDIAccess) {
-                navigator.requestMIDIAccess().then(
-                    (midiAccess) => {
-                        let connectedCount = 0;
-                        for (let input of midiAccess.inputs.values()) {
-                            connectedCount++;
-                            input.onmidimessage = (message) => {
-                                const [command, note, velocity] = message.data;
-                                if (command === 144 && velocity > 0) {
-                                    const noteName = NOTE_NAMES[note % 12] + (Math.floor(note / 12) - 1);
-                                    handleNotePlayed(noteName, 'user');
-                                }
-                            };
-                        }
-                        if (connectedCount > 0) {
-                            document.getElementById('midiDeviceText').innerText = `${connectedCount} Device Aktif`;
-                        }
-                    },
-                    (err) => console.log('WebMIDI access denied or unsupported:', err)
-                );
-            }
-        }
-
-        /* ==========================================================================
-           8. SIMPLY PIANO SONG SWITCHING & GAME LOGIC
-           ========================================================================== */
-        function changeSong(songKey) {
-            currentSongKey = songKey;
-            loadSong(songKey);
-            renderVexflowSheet();
-        }
-
-        function loadSong(songKey) {
-            const song = SONGS[songKey];
-            activeNoteIndex = 0;
-            score = 0;
-            combo = 0;
-            totalHits = 0;
-            correctHits = 0;
-            songTimeAccumulator = 0;
-            updateScoreUI();
-
-            let cumulativeTime = 2.0;
-            activeSongNotes = song.notes.map((n, idx) => {
-                const beatDuration = (60 / song.bpm) * n.duration;
-                const noteObj = {
-                    id: idx,
-                    note: n.note,
-                    midi: noteToMidi(n.note),
-                    startTime: cumulativeTime,
-                    duration: beatDuration,
-                    status: 'pending'
-                };
-                cumulativeTime += beatDuration;
-                return noteObj;
-            });
-
-            document.getElementById('sheetTitle').innerText = `"${song.title}"`;
-            document.getElementById('sheetBpm').innerText = `♩ = ${song.bpm}`;
-            document.getElementById('sheetKey').innerText = `Key: ${song.key}`;
-
-            updateTargetNoteDisplay();
-        }
-
-        function setPlayMode(mode) {
-            playMode = mode;
-            const waitBtn = document.getElementById('modeWaitBtn');
-            const playBtn = document.getElementById('modePlayBtn');
-
-            if (mode === 'wait') {
-                waitBtn.className = 'px-3 py-1.5 rounded-lg transition-all bg-purple-600 text-white shadow';
-                playBtn.className = 'px-3 py-1.5 rounded-lg transition-all text-slate-400 hover:text-slate-200';
-                document.getElementById('waitBanner').classList.remove('opacity-0');
-            } else {
-                playBtn.className = 'px-3 py-1.5 rounded-lg transition-all bg-purple-600 text-white shadow';
-                waitBtn.className = 'px-3 py-1.5 rounded-lg transition-all text-slate-400 hover:text-slate-200';
-                document.getElementById('waitBanner').classList.add('opacity-0');
-            }
-        }
-
-        function toggleVisualizerView() {
-            const sheetContainer = document.getElementById('sheetMusicContainer');
-            const label = document.getElementById('viewToggleLabel');
-
-            if (visualizerView === 'synthesia') {
-                visualizerView = 'sheet';
-                sheetContainer.classList.remove('hidden');
-                sheetContainer.classList.add('flex');
-                label.innerText = 'Modus: Partitur Balok';
-            } else {
-                visualizerView = 'synthesia';
-                sheetContainer.classList.add('hidden');
-                sheetContainer.classList.remove('flex');
-                label.innerText = 'Modus: Synthesia';
-            }
-        }
-
-        function updateBPM(val) {
-            bpmMultiplier = parseFloat(val) / 100;
-            const currentBpm = Math.round(SONGS[currentSongKey].bpm * bpmMultiplier);
-            document.getElementById('bpmValue').innerText = `${val}% (${currentBpm})`;
-        }
-
-        function handleNotePlayed(noteName, source = 'user') {
-            const midi = noteToMidi(noteName);
-            playTone(midiToFreq(midi), 0.7);
-            highlightKey(noteName, 'user');
-
-            if (activeNoteIndex >= activeSongNotes.length) return;
-
-            const target = activeSongNotes[activeNoteIndex];
-            const playedMidi = midi;
-
-            if (playedMidi === target.midi) {
-                target.status = 'hit';
-                activeNoteIndex++;
-                combo++;
-                totalHits++;
-                correctHits++;
-                score += 100 + (combo * 10);
-
-                showFeedback('PERFECT!', 'text-emerald-400');
-                highlightKey(noteName, 'correct');
-                updateTargetNoteDisplay();
-            } else {
-                if (playMode === 'play') {
-                    combo = 0;
-                    totalHits++;
-                    showFeedback('MISS', 'text-rose-500');
-                    highlightKey(noteName, 'wrong');
-                }
-            }
-
-            updateScoreUI();
-        }
-
-        function highlightKey(noteName, type) {
-            const keyEl = document.querySelector(`[data-note="${noteName}"]`) || document.querySelector(`[data-midi="${noteToMidi(noteName)}"]`);
-            if (!keyEl) return;
-
-            if (type === 'correct') {
-                keyEl.classList.add('key-active-correct');
-                setTimeout(() => keyEl.classList.remove('key-active-correct'), 250);
-            } else if (type === 'wrong') {
-                keyEl.classList.add('key-active-wrong');
-                setTimeout(() => keyEl.classList.remove('key-active-wrong'), 250);
-            } else {
-                keyEl.classList.add('bg-purple-500');
-                setTimeout(() => keyEl.classList.remove('bg-purple-500'), 150);
-            }
-        }
-
-        function updateTargetNoteDisplay() {
-            const targetNoteEl = document.getElementById('targetNoteName');
-            if (activeNoteIndex < activeSongNotes.length) {
-                targetNoteEl.innerText = activeSongNotes[activeNoteIndex].note;
-            } else {
-                targetNoteEl.innerText = 'SELESAI! 🎉';
-                showFeedback('LAGU SELESAI!', 'text-amber-300');
-            }
-        }
-
-        function showFeedback(text, colorClass) {
-            const fb = document.getElementById('feedbackText');
-            fb.innerText = text;
-            fb.className = `absolute top-1/3 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-3xl md:text-5xl font-extrabold tracking-wider pointer-events-none transition-all duration-200 z-20 text-center ${colorClass} scale-110 opacity-100`;
-
-            setTimeout(() => {
-                fb.classList.remove('scale-110', 'opacity-100');
-                fb.classList.add('scale-90', 'opacity-0');
-            }, 400);
-        }
-
-        function updateScoreUI() {
-            document.getElementById('scoreDisplay').innerText = score;
-            document.getElementById('comboDisplay').innerText = combo + 'x';
-            const acc = totalHits > 0 ? Math.round((correctHits / totalHits) * 100) : 100;
-            document.getElementById('accuracyDisplay').innerText = acc + '%';
-        }
-
-        /* ==========================================================================
-           9. CANVAS GAME LOOP
-           ========================================================================== */
-        function gameLoop(now) {
-            const deltaTime = (now - lastFrameTime) / 1000;
-            lastFrameTime = now;
-
-            if (playMode === 'play' || (playMode === 'wait' && activeNoteIndex < activeSongNotes.length)) {
-                if (playMode === 'play') {
-                    songTimeAccumulator += deltaTime * bpmMultiplier;
-                } else {
-                    if (activeNoteIndex < activeSongNotes.length) {
-                        const targetTime = activeSongNotes[activeNoteIndex].startTime;
-                        if (songTimeAccumulator < targetTime) {
-                            songTimeAccumulator += deltaTime * bpmMultiplier;
-                            if (songTimeAccumulator > targetTime) songTimeAccumulator = targetTime;
-                        }
-                    }
-                }
-            }
-
-            renderVisualizer();
-            requestAnimationFrame(gameLoop);
-        }
-
-        function renderVisualizer() {
-            if (!fallingCtx) return;
-            fallingCtx.clearRect(0, 0, fallingCanvas.width, fallingCanvas.height);
-
-            const startMidi = (startOctave + 1) * 12;
-            const endMidi = startMidi + totalKeysToRender;
-
-            const canvasRect = fallingCanvas.getBoundingClientRect();
-            const speed = 200;
-
-            activeSongNotes.forEach((n, idx) => {
-                if (n.midi < startMidi || n.midi >= endMidi) return;
-
-                const timeOffset = n.startTime - songTimeAccumulator;
-                const noteY = fallingCanvas.height - (timeOffset * speed);
-                const noteHeight = Math.max(26, n.duration * speed * 0.7);
-
-                const keyEl = document.querySelector(`[data-midi="${n.midi}"]`);
-                if (!keyEl) return;
-
-                const kRect = keyEl.getBoundingClientRect();
-                const noteX = kRect.left - canvasRect.left + 2;
-                const noteWidth = kRect.width - 4;
-
-                if (noteY + noteHeight > 0 && noteY - noteHeight < fallingCanvas.height + 60) {
-                    const isTarget = idx === activeNoteIndex;
-
-                    if (n.status === 'hit') {
-                        fallingCtx.fillStyle = '#10b981';
-                    } else if (isTarget) {
-                        fallingCtx.fillStyle = '#00ffff';
-                    } else {
-                        fallingCtx.fillStyle = '#475569';
-                    }
-
-                    fallingCtx.beginPath();
-                    fallingCtx.roundRect(noteX, noteY - noteHeight, noteWidth, noteHeight, 6);
-                    fallingCtx.fill();
-
-                    if (isTarget) {
-                        fallingCtx.lineWidth = 3;
-                        fallingCtx.strokeStyle = '#fbbf24';
-                        fallingCtx.stroke();
-
-                        fallingCtx.fillStyle = '#000000';
-                        fallingCtx.font = 'bold 11px Outfit, sans-serif';
-                        fallingCtx.textAlign = 'center';
-                        fallingCtx.fillText(n.note, noteX + noteWidth / 2, noteY - noteHeight / 2 + 4);
-                    }
-                }
-
-                if (playMode === 'play' && n.status === 'pending' && noteY > fallingCanvas.height + 20) {
-                    n.status = 'miss';
-                    activeNoteIndex++;
-                    combo = 0;
-                    totalHits++;
-                    updateScoreUI();
-                    updateTargetNoteDisplay();
-                }
-            });
-        }
-
-        /* ==========================================================================
-           10. VEXFLOW SHEET MUSIC RENDERER
-           ========================================================================== */
-        function renderVexflowSheet() {
-            const VF = Vex.Flow;
-            const container = document.getElementById('vexflowOutput');
-            container.innerHTML = '';
-
-            const renderer = new VF.Renderer(container, VF.Renderer.Backends.SVG);
-            renderer.resize(750, 220);
-            const context = renderer.getContext();
-
-            const staveTreble = new VF.Stave(10, 20, 720);
-            staveTreble.addClef("treble").addKeySignature("Ab").addTimeSignature("4/4");
-            staveTreble.setContext(context).draw();
-
-            const currentSong = SONGS[currentSongKey];
-            const notes = currentSong.notes.slice(0, 6).map(n => {
-                const octave = n.note.slice(-1);
-                const noteBase = n.note.slice(0, -1).toLowerCase();
-                return new VF.StaveNote({ keys: [`${noteBase}/${octave}`], duration: "8" });
-            });
-
-            const voice = new VF.Voice({ num_beats: 3, beat_value: 4 });
-            voice.addTickables(notes);
-
-            new VF.Formatter().joinVoices([voice]).format([voice], 600);
-            voice.draw(context, staveTreble);
-        }
-    </script>
-</body>
-</html>
+            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            if (audioCtx
