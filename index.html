@@ -1,406 +1,415 @@
-
 <!DOCTYPE html>
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<title>Undertale Piano Trainer</title>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>Undertale Piano — 40 Fitur</title>
 <style>
-:root {
-  color-scheme: dark;
-  --bg: #101116;
-  --panel: #1b1d27;
-  --accent: #ffe45c;
-  --green: #5aff9b;
-  --red: #ff5b6b;
-}
-* { box-sizing: border-box; }
-body {
-  margin: 0;
-  background: var(--bg);
-  color: white;
-  font-family: system-ui, sans-serif;
-  overflow-x: hidden;
-}
-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-  padding: 10px 14px;
-  background: #191a22;
-  border-bottom: 1px solid #393b48;
-}
-h1 { font-size: 17px; margin: 0; }
-main { padding: 10px; max-width: 1100px; margin: auto; }
-.toolbar {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  align-items: center;
-  margin-bottom: 10px;
-}
-button, select {
-  border: 1px solid #55596b;
-  background: #292c38;
-  color: white;
-  border-radius: 8px;
-  padding: 9px 12px;
-  font-size: 14px;
-}
-button:active { transform: scale(.97); }
-button.active { background: #675a15; border-color: var(--accent); }
-button:disabled { opacity: .45; }
-.panel {
-  background: var(--panel);
-  border: 1px solid #353846;
-  border-radius: 10px;
-  padding: 10px;
-  margin-bottom: 10px;
-}
-.statusline {
-  display: flex;
-  gap: 12px;
-  flex-wrap: wrap;
-  align-items: center;
-}
-#micStatus { color: #b9c3d9; overflow-wrap: anywhere; }
-#practiceStatus { color: var(--green); }
-.target {
-  font-size: 24px;
-  font-weight: 800;
-  color: var(--accent);
-}
-.small { color: #a9adbd; font-size: 12px; }
-#visualizer {
-  position: relative;
-  height: 170px;
-  overflow: hidden;
-  border-radius: 8px;
-  background: #08090e;
-  border: 1px solid #373948;
-  margin-bottom: 10px;
-}
-#targetLine {
-  position: absolute;
-  left: 0; right: 0; bottom: 28px;
-  border-top: 2px dashed #666b7d;
-}
-#fallingNotes {
-  position: absolute; inset: 0;
-}
-.fallnote {
-  position: absolute;
-  height: 18px;
-  min-width: 28px;
-  border-radius: 5px;
-  background: var(--accent);
-  color: #171717;
-  font-size: 11px;
-  font-weight: 800;
-  text-align: center;
-  padding: 2px 4px;
-}
-#keyboard {
-  position: relative;
-  display: flex;
-  height: clamp(150px, 30vh, 230px);
-  width: 100%;
-  user-select: none;
-  touch-action: manipulation;
-  margin-top: 10px;
-}
-.key {
-  position: relative;
-  flex: 1;
-  min-width: 0;
-  border: 1px solid #8e92a0;
-  border-radius: 0 0 6px 6px;
-  background: #f5f5f5;
-  color: #171717;
-  display: flex;
-  align-items: flex-end;
-  justify-content: center;
-  padding-bottom: 8px;
-  font-size: 11px;
-}
-.key.black {
-  position: absolute;
-  z-index: 2;
-  top: 0;
-  height: 62%;
-  width: 4.2%;
-  min-width: 16px;
-  background: #171923;
-  border: 1px solid #555a6c;
-  border-radius: 0 0 5px 5px;
-  color: white;
-  padding-bottom: 5px;
-  transform: translateX(-50%);
-}
-.key.pressed { background: #ffe45c; color: #111; }
-.key.black.pressed { background: #f2b93e; }
-.key.correct { box-shadow: inset 0 0 0 4px #26bd70; }
-#micMeter {
-  height: 7px;
-  background: #333644;
-  border-radius: 9px;
-  overflow: hidden;
-  margin-top: 7px;
-}
-#micLevel {
-  height: 100%;
-  width: 0;
-  background: var(--green);
-  transition: width .06s;
-}
-@media (orientation: portrait) {
-  header h1 { font-size: 14px; }
-  main { padding: 7px; }
-  #visualizer { height: 130px; }
-  button, select { padding: 8px 9px; font-size: 12px; }
-}
+*{box-sizing:border-box}
+body{margin:0;background:#0b0d14;color:#fff;font:14px system-ui}
+header{position:sticky;top:0;background:#171b27;padding:10px;display:flex;justify-content:space-between;z-index:3}
+main{padding:9px;max-width:1100px;margin:auto}
+section{background:#171b27;border:1px solid #363d50;border-radius:12px;padding:12px;margin-bottom:10px}
+h2{font-size:14px;color:#ffe45e;margin:0 0 10px}
+.row{display:flex;gap:7px;align-items:center;flex-wrap:wrap}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(115px,1fr));gap:7px}
+.stat{background:#0d1019;border-radius:8px;padding:9px}
+.stat small{color:#aeb7cd}.stat strong{display:block;font-size:22px}
+button,select,input{font:inherit;color:white;background:#292f40;border:1px solid #4a536b;border-radius:8px;padding:9px;max-width:100%}
+button{cursor:pointer}button.on{border-color:#ffe45e;color:#ffe45e}
+#target{color:#ffe45e}#heard{color:#55ffad}
+#status{margin-top:8px;color:#aeb7cd;overflow-wrap:anywhere}
+#meter{height:8px;background:#33394b;border-radius:8px;margin:8px 0;overflow:hidden}
+#level{height:100%;width:0;background:#55ffad}
+#keyboard{height:190px;display:flex;position:relative;user-select:none;touch-action:manipulation}
+.key{flex:1;min-width:0;background:#fff;color:#111;border:1px solid #aaa;border-radius:0 0 5px 5px;display:flex;align-items:flex-end;justify-content:center;padding:0 0 6px;font-size:10px}
+.key.black{position:absolute;z-index:2;top:0;height:62%;width:4.2%;min-width:13px;transform:translateX(-50%);background:#121521;color:#fff;border-color:#666}
+.key.lit{background:#ffe45e!important;color:#111!important}
+#roll{height:100px;overflow:hidden;position:relative;background:#090b10;border-radius:8px}
+.note{position:absolute;padding:3px 7px;background:#ffe45e;color:#111;border-radius:4px;font-size:11px}
+#toast{display:none;position:fixed;bottom:10px;left:10px;right:10px;background:#30384c;padding:12px;border-radius:8px}
+@media(orientation:portrait){#keyboard{height:150px}}
 </style>
 </head>
 <body>
-<header>
-  <h1>UNDERTALE · PIANO TRAINER</h1>
-  <button id="fullscreenBtn">Fullscreen</button>
-</header>
-
+<header><b>UNDERTALE PIANO LAB</b><button id="fullscreen">Fullscreen</button></header>
 <main>
-  <div class="toolbar">
-    <label for="songSelect">Lagu:</label>
-    <select id="songSelect">
-      <option value="finale">Finale — latihan</option>
-      <option value="mega">Megalovania — latihan</option>
-      <option value="best">Your Best Friend — latihan</option>
-      <option value="asgore">Asgore — latihan</option>
-      <option value="scale">C Major Scale</option>
-    </select>
-    <button id="startBtn">Mulai / Ulangi</button>
-    <button id="waitBtn" class="active">WAIT: ON</button>
-    <button id="flowBtn">FLOW: OFF</button>
-  </div>
+<section>
+<h2>01 · Lagu dan mode</h2>
+<div class="row">
+<select id="song">
+<option value="finale">Finale — latihan</option>
+<option value="mega">Megalovania — latihan</option>
+<option value="best">Your Best Friend — latihan</option>
+<option value="asgore">Asgore — latihan</option>
+<option value="scale">C Major Scale</option>
+</select>
+<button id="wait" class="on">WAIT: ON</button>
+<button id="flow">FLOW: OFF</button>
+<button id="restart">Mulai ulang</button>
+<button id="pause">Jeda</button>
+</div>
+<div class="row" style="margin-top:8px">
+<label>Tempo <input id="tempo" type="range" min="40" max="220" value="120"></label>
+<span id="tempoText">120 BPM</span>
+<label>Volume <input id="vol" type="range" min="0" max="100" value="35"></label>
+<label>Transpose
+<select id="transpose"><option value="-12">-12</option><option value="0" selected>0</option><option value="12">+12</option></select>
+</label>
+</div>
+<div id="songInfo"></div>
+</section>
 
-  <section class="panel">
-    <div class="statusline">
-      <div>
-        <div class="small">NADA YANG DITUNGGU</div>
-        <div id="targetNote" class="target">C4</div>
-      </div>
-      <div>
-        <div class="small">PROGRES</div>
-        <strong id="progress">0 / 0</strong>
-      </div>
-      <div>
-        <div class="small">MICROPHONE</div>
-        <div id="micStatus">Belum aktif</div>
-      </div>
-    </div>
-    <div id="micMeter"><div id="micLevel"></div></div>
-    <div class="toolbar" style="margin-top:10px;margin-bottom:0">
-      <button id="micBtn">Aktifkan Mic</button>
-      <button id="stopMicBtn">Matikan Mic</button>
-      <button id="testToneBtn">Tes Suara Piano</button>
-    </div>
-    <div id="practiceStatus" style="margin-top:9px">Siap latihan.</div>
-    <div class="small" style="margin-top:6px">
-      WAIT: nada berikutnya baru maju setelah nada yang benar dimainkan.
-      Pakai headphone jika suara speaker terbaca kembali oleh mic.
-    </div>
-  </section>
+<section>
+<h2>02 · Deteksi nada mikrofon</h2>
+<div class="row">
+<button id="micOn">Aktifkan mic</button>
+<button id="micOff">Matikan mic</button>
+<button id="calibrate">Kalibrasi noise</button>
+<label>Sensitivitas <input id="sens" type="range" min="1" max="5" step=".5" value="1"></label>
+</div>
+<div class="grid" style="margin-top:8px">
+<div class="stat"><small>NADA TARGET</small><strong id="target">C4</strong></div>
+<div class="stat"><small>NADA TERDETEKSI</small><strong id="heard">—</strong></div>
+<div class="stat"><small>FREKUENSI</small><strong id="hz">— Hz</strong></div>
+<div class="stat"><small>PROGRES</small><strong id="progress">0/0</strong></div>
+</div>
+<div id="meter"><div id="level"></div></div>
+<div id="status">Mic belum aktif.</div>
+<p style="color:#aeb7cd">Gunakan HTTPS atau localhost. Tes dengan suara piano dari perangkat/instrumen lain. Browser tidak otomatis mengirim suara piano virtual ke mic.</p>
+</section>
 
-  <div id="visualizer">
-    <div id="fallingNotes"></div>
-    <div id="targetLine"></div>
-  </div>
+<section>
+<h2>03 · Skor dan latihan</h2>
+<div class="grid">
+<div class="stat"><small>SKOR</small><strong id="score">0</strong></div>
+<div class="stat"><small>AKURASI</small><strong id="accuracy">—</strong></div>
+<div class="stat"><small>KESALAHAN</small><strong id="errors">0</strong></div>
+<div class="stat"><small>STREAK</small><strong id="streak">0</strong></div>
+</div>
+<div class="row" style="margin-top:8px">
+<button id="replay">Dengar target</button>
+<button id="skip">Lewati nada</button>
+<button id="previous">Nada sebelumnya</button>
+<label><input id="strict" type="checkbox"> Deteksi ketat</label>
+<label><input id="octave" type="checkbox" checked> Periksa oktaf</label>
+<label><input id="auto" type="checkbox" checked> Lanjut setelah benar</label>
+</div>
+<div id="message" style="margin-top:8px;color:#55ffad">Pilih lagu untuk mulai.</div>
+</section>
 
-  <section class="panel">
-    <div class="statusline">
-      <strong>Piano virtual C3–B4</strong>
-      <span class="small">Ketuk tuts atau gunakan keyboard komputer.</span>
-    </div>
-    <div id="keyboard"></div>
-  </section>
+<section>
+<h2>04 · Visualizer not</h2>
+<div id="roll"></div>
+<div class="row" style="margin-top:8px">
+<label><input id="showNotes" type="checkbox" checked> Tampilkan nada selanjutnya</label>
+<label><input id="showNames" type="checkbox" checked> Label nada</label>
+</div>
+</section>
+
+<section>
+<h2>05 · Piano virtual dua oktaf</h2>
+<div class="row">
+<button id="test">Tes A4</button>
+<label><input id="sound" type="checkbox" checked> Suara piano</label>
+<label><input id="computer" type="checkbox" checked> Keyboard komputer</label>
+<label><input id="highlight" type="checkbox" checked> Highlight target</label>
+</div>
+<div id="keyboard" style="margin-top:10px"></div>
+</section>
+
+<section>
+<h2>06 · Simpan dan alat</h2>
+<div class="row">
+<button id="save">Simpan progres</button>
+<button id="load">Muat progres</button>
+<button id="export">Ekspor statistik</button>
+<button id="reset">Reset statistik</button>
+<button id="help">Bantuan</button>
+</div>
+<details style="margin-top:8px">
+<summary>Daftar 40 fitur</summary>
+<ol id="features"></ol>
+</details>
+</section>
 </main>
+<div id="toast"></div>
 
 <script>
 "use strict";
 
-// ---------- MUSIK DAN PITCH ----------
-const NOTE_NAMES = [
-  "C", "C#", "D", "D#", "E", "F",
-  "F#", "G", "G#", "A", "A#", "B"
+const FEATURES=[
+"WAIT Mode","FLOW Mode","Pemilih lagu","Tempo","Volume",
+"Transpose","Piano dua oktaf","Tuts putih","Tuts hitam","Sentuh layar",
+"Keyboard komputer","Suara sintetis","Tes A4","Aktifkan mic",
+"Matikan mic","Penanganan izin mic","Pengukur sinyal","Deteksi pitch YIN",
+"Nama nada","Frekuensi Hz","Deteksi oktaf","Sensitivitas mic",
+"Kalibrasi noise","Target nada","Cocokkan nada WAIT","Skor",
+"Akurasi","Penghitung kesalahan","Streak","Progres lagu",
+"Replay target","Lewati nada","Kembali satu nada","Jeda",
+"Mulai ulang","Visualizer not","Highlight target","Simpan progres",
+"Muat progres","Ekspor statistik"
 ];
+const fl=document.getElementById("features");
+FEATURES.forEach(x=>{let li=document.createElement("li");li.textContent=x;fl.appendChild(li)});
 
-function midiName(midi) {
-  return NOTE_NAMES[((midi % 12) + 12) % 12] +
-    (Math.floor(midi / 12) - 1);
-}
+const $=id=>document.getElementById(id);
+const names=["C","C#","D","D#","E","F","F#","G","G#","A","A#","B"];
+const name=m=>names[(m%12+12)%12]+(Math.floor(m/12)-1);
+const freq=m=>440*Math.pow(2,(m-69)/12);
 
-function frequencyFromMidi(midi) {
-  return 440 * Math.pow(2, (midi - 69) / 12);
-}
-
-// MIDI numbers. These are practice motifs, not full sheet transcriptions.
-const SONGS = {
-  finale: {
-    name: "Finale — latihan",
-    bpm: 190,
-    notes: [
-      [72,1],[74,1],[75,1],[77,2],[75,1],[72,2],
-      [70,1],[72,1],[74,1],[75,2],[79,2],[77,1],
-      [75,1],[74,1],[72,2],[70,2],[72,1],[74,1],
-      [75,1],[77,2],[75,1],[74,1],[72,2]
-    ]
-  },
-  mega: {
-    name: "Megalovania — latihan",
-    bpm: 120,
-    notes: [
-      [62,1],[62,1],[69,2],[65,2],[64,2],
-      [62,1],[65,1],[69,2],[72,2],[71,1],
-      [69,1],[65,1],[62,1],[64,1],[65,1],
-      [60,1],[60,1],[69,2],[65,2],[64,2],
-      [62,1],[65,1],[69,2],[72,2],[71,1],
-      [69,1],[65,1],[62,1],[64,1],[65,1]
-    ]
-  },
-  best: {
-    name: "Your Best Friend — latihan",
-    bpm: 125,
-    notes: [
-      [60,1],[64,1],[67,1],[69,1],[67,1],[64,1],
-      [60,1],[64,1],[67,1],[72,2],[71,1],[69,1],
-      [67,1],[64,1],[62,1],[60,2]
-    ]
-  },
-  asgore: {
-    name: "Asgore — latihan",
-    bpm: 110,
-    notes: [
-      [48,2],[55,1],[60,1],[63,2],[62,1],[60,1],
-      [58,2],[55,1],[58,1],[60,2],[63,1],[65,1],
-      [67,2],[65,1],[63,1],[60,2],[58,1],[55,1]
-    ]
-  },
-  scale: {
-    name: "C Major Scale",
-    bpm: 90,
-    notes: [
-      [60,1],[62,1],[64,1],[65,1],[67,1],[69,1],
-      [71,1],[72,1],[71,1],[69,1],[67,1],[65,1],
-      [64,1],[62,1],[60,2]
-    ]
-  }
+const songs={
+ finale:{title:"Finale — motif latihan",bpm:190,n:[72,74,75,77,75,72,70,72,74,75,79,77,75,74,72,70,72,74,75,77,75,74,72]},
+ mega:{title:"Megalovania — motif latihan",bpm:120,n:[62,62,69,65,64,62,65,69,72,71,69,65,62,64,65,60,60,69,65,64,62,65,69,72,71,69,65,62,64,65]},
+ best:{title:"Your Best Friend — motif latihan",bpm:125,n:[60,64,67,69,67,64,60,64,67,72,71,69,67,64,62,60]},
+ asgore:{title:"Asgore — motif latihan",bpm:110,n:[48,55,60,63,62,60,58,55,58,60,63,65,67,65,63,60,58,55]},
+ scale:{title:"C Major Scale",bpm:90,n:[60,62,64,65,67,69,71,72,71,69,67,65,64,62,60]}
 };
 
-// ---------- AUDIO PIANO ----------
-let audioContext = null;
+let song=songs.finale, seq=song.n.slice(), i=0, mode="WAIT", paused=false;
+let score=0,errors=0,streak=0,attempts=0,correct=0;
+let ctx=null,stream=null,micCtx=null,analyser=null,buffer=null,raf=0;
+let noise=.008,lastMidi=-1,stable=0,lastAccept=0,flowTimer=0;
+const keys=new Map();
 
-async function getAudioContext() {
-  if (!audioContext || audioContext.state === "closed") {
-    audioContext = new (window.AudioContext ||
-      window.webkitAudioContext)();
+function msg(t){$("message").textContent=t}
+function toast(t){$("toast").textContent=t;$("toast").style.display="block";clearTimeout(toast.t);toast.t=setTimeout(()=>$("toast").style.display="none",2400)}
+async function audio(){
+ if(!ctx)ctx=new(window.AudioContext||window.webkitAudioContext)();
+ if(ctx.state==="suspended")await ctx.resume();
+ return ctx;
+}
+async function play(m,d=.3){
+ if(!$("sound").checked)return;
+ const a=await audio(),t=a.currentTime,v=+$("vol").value/100;
+ const o=a.createOscillator(),g=a.createGain();
+ o.type="triangle";o.frequency.value=freq(m);
+ g.gain.setValueAtTime(.001,t);g.gain.linearRampToValueAtTime(Math.max(.001,v),t+.015);
+ g.gain.exponentialRampToValueAtTime(.001,t+d);
+ o.connect(g);g.connect(a.destination);o.start(t);o.stop(t+d+.03);
+}
+function target(){return i<seq.length?seq[i]+ +$("transpose").value:null}
+function update(){
+ $("target").textContent=target()===null?"SELESAI":name(target());
+ $("progress").textContent=Math.min(i,seq.length)+"/"+seq.length;
+ $("score").textContent=score;$("errors").textContent=errors;$("streak").textContent=streak;
+ $("accuracy").textContent=attempts?Math.round(correct/attempts*100)+"%":"—";
+ $("songInfo").textContent=song.title+" · "+song.bpm+" BPM";
+ drawRoll();highlight();
+}
+function highlight(){
+ keys.forEach((el,m)=>el.classList.toggle("lit",$("highlight").checked&&m===target()));
+}
+function drawRoll(){
+ const r=$("roll");r.innerHTML="";
+ if(!$("showNotes").checked)return;
+ for(let j=0;j<Math.min(8,seq.length-i);j++){
+  const el=document.createElement("div");el.className="note";
+  el.style.left=(3+j*12)+"%";el.style.top=(5+j*11)+"px";
+  el.textContent=$("showNames").checked?name(seq[i+j]+ +$("transpose").value):"●";
+  if(j===0)el.style.background="#55ffad";
+  r.appendChild(el);
+ }
+}
+function finish(){
+ clearTimeout(flowTimer);msg("Selesai! Skor "+score+" · Akurasi "+(attempts?Math.round(correct/attempts*100):0)+"%");
+}
+function hit(m,source){
+ if(paused||mode!=="WAIT"||i>=seq.length)return;
+ let t=target(),ok=$("octave").checked?m===t:m%12===t%12;
+ if(ok){
+  if(source==="mic"&&performance.now()-lastAccept<350)return;
+  lastAccept=performance.now();correct++;attempts++;score+=10;streak++;i++;
+  msg("Benar! "+name(m)+(i<seq.length?" — berikutnya "+name(target()):""));
+  if(navigator.vibrate)navigator.vibrate(25);
+  update();if(i>=seq.length)finish();
+ }else if(source==="mic"&&performance.now()-lastAccept>500){
+  attempts++;errors++;streak=0;lastAccept=performance.now();
+  msg("Terdengar "+name(m)+", target "+name(t));update();
+ }
+}
+function restart(){
+ clearTimeout(flowTimer);i=0;score=0;errors=0;streak=0;attempts=0;correct=0;paused=false;
+ $("pause").textContent="Jeda";update();msg("Target pertama: "+name(target()));
+ if(mode==="FLOW")flow();
+}
+function setMode(m){
+ mode=m;clearTimeout(flowTimer);
+ $("wait").classList.toggle("on",m==="WAIT");$("flow").classList.toggle("on",m==="FLOW");
+ $("wait").textContent=m==="WAIT"?"WAIT: ON":"WAIT: OFF";
+ $("flow").textContent=m==="FLOW"?"FLOW: ON":"FLOW: OFF";
+ msg(m==="WAIT"?"WAIT: tunggu nada target.":"FLOW: pemutaran otomatis.");
+ if(m==="FLOW")flow();
+}
+async function flow(){
+ if(mode!=="FLOW"||paused||i>=seq.length)return;
+ let m=target();await play(m,.22);flash(m);i++;update();
+ if(i>=seq.length){finish();return}
+ flowTimer=setTimeout(flow,60000/(+$("tempo").value));
+}
+function flash(m){const el=keys.get(m);if(!el)return;el.classList.add("lit");setTimeout(()=>{el.classList.remove("lit");highlight()},180)}
+async function press(m){
+ flash(m);await play(m);
+ if(mode==="WAIT")hit(m,"piano");
+}
+
+function buildKeys(){
+ const host=$("keyboard");host.innerHTML="";keys.clear();
+ const white=[];for(let m=48;m<=71;m++)if(![1,3,6,8,10].includes(m%12))white.push(m);
+ const w=100/white.length;
+ white.forEach((m,j)=>{
+  const b=document.createElement("button");b.className="key";b.style.width=w+"%";
+  b.textContent=name(m);host.appendChild(b);keys.set(m,b);
+  b.addEventListener("pointerdown",e=>{e.preventDefault();press(m)});
+ });
+ for(let m=48;m<=71;m++){
+  if(![1,3,6,8,10].includes(m%12))continue;
+  const prev=white.indexOf(m-1);if(prev<0)continue;
+  const b=document.createElement("button");b.className="key black";
+  b.style.left=((prev+1)*w)+"%";b.textContent=name(m);
+  host.appendChild(b);keys.set(m,b);
+  b.addEventListener("pointerdown",e=>{e.preventDefault();press(m)});
+ }
+}
+const computer={a:60,w:61,s:62,e:63,d:64,f:65,t:66,g:67,y:68,h:69,u:70,j:71,k:72};
+window.addEventListener("keydown",e=>{
+ if(e.repeat||!$("computer").checked||/INPUT|SELECT/.test(e.target.tagName))return;
+ if(computer[e.key.toLowerCase()]!==undefined)press(computer[e.key.toLowerCase()]);
+});
+
+// YIN pitch detector.
+function yin(x,sr){
+ let n=x.length,rms=0;
+ for(let v of x)rms+=v*v;
+ rms=Math.sqrt(rms/n);
+ if(rms<noise)return {f:0,rms,p:0};
+ let min=Math.max(2,Math.floor(sr/1000)),max=Math.min(Math.floor(sr/55),Math.floor(n/2));
+ let d=new Float32Array(max+1),c=new Float32Array(max+1),sum=0;c[0]=1;
+ for(let tau=1;tau<=max;tau++){
+  let s=0;for(let j=0;j<n-max;j++){let q=x[j]-x[j+tau];s+=q*q}
+  d[tau]=s;sum+=s;c[tau]=sum?d[tau]*tau/sum:1;
+ }
+ let tau=-1,threshold=$("strict").checked?.10:.16;
+ for(let t=min;t<=max;t++)if(c[t]<threshold){
+  while(t+1<=max&&c[t+1]<c[t])t++;
+  tau=t;break;
+ }
+ if(tau<0){
+  let best=Infinity;
+  for(let t=min;t<=max;t++)if(c[t]<best){best=c[t];tau=t}
+  if(best>.35)return {f:0,rms,p:0};
+ }
+ let better=tau;
+ if(tau>1&&tau<max){
+  let a=c[tau-1],b=c[tau],z=c[tau+1],den=2*b-z-a;
+  if(Math.abs(den)>1e-8)better=tau+(z-a)/(2*den);
+ }
+ return {f:sr/better,rms,p:1-c[tau]};
+}
+async function startMic(){
+ try{
+  stopMic();
+  if(!navigator.mediaDevices?.getUserMedia)throw Error("Gunakan HTTPS atau localhost.");
+  $("status").textContent="Meminta izin mikrofon...";
+  stream=await navigator.mediaDevices.getUserMedia({audio:{
+   echoCancellation:true,noiseSuppression:false,autoGainControl:false
+  }});
+  micCtx=new(window.AudioContext||window.webkitAudioContext)();await micCtx.resume();
+  analyser=micCtx.createAnalyser();analyser.fftSize=8192;
+  micCtx.createMediaStreamSource(stream).connect(analyser);
+  buffer=new Float32Array(analyser.fftSize);
+  $("status").textContent="Mic aktif. Mainkan satu nada yang jelas.";
+  loop();
+ }catch(e){$("status").textContent="Mic gagal: "+e.message;toast("Periksa izin mikrofon browser.");}
+}
+function stopMic(){
+ cancelAnimationFrame(raf);
+ if(stream)stream.getTracks().forEach(t=>t.stop());
+ if(micCtx)micCtx.close().catch(()=>{});
+ stream=null;micCtx=null;analyser=null;buffer=null;
+ $("status").textContent="Mic dimatikan.";$("level").style.width="0%";
+}
+function loop(){
+ if(!analyser)return;
+ analyser.getFloatTimeDomainData(buffer);
+ const g=+$("sens").value;
+ if(g!==1)for(let j=0;j<buffer.length;j++)buffer[j]*=g;
+ const p=yin(buffer,micCtx.sampleRate);
+ $("level").style.width=Math.min(100,p.rms*1000)+"%";
+ if(p.f>45&&p.f<1500&&p.p>.65){
+  let m=Math.round(69+12*Math.log2(p.f/440));
+  $("heard").textContent=name(m);$("hz").textContent=p.f.toFixed(1)+" Hz";
+  $("status").textContent="Nada "+name(m)+" · keyakinan "+Math.round(p.p*100)+"%";
+  let now=performance.now();
+  if(lastMidi===m){if(!stable)stable=now;if(now-stable>120)hit(m,"mic")}
+  else{lastMidi=m;stable=now}
+ }else{
+  $("heard").textContent="—";$("hz").textContent="— Hz";
+  $("status").textContent="Mic aktif — menunggu nada...";
+  lastMidi=-1;stable=0;
+ }
+ raf=requestAnimationFrame(loop);
+}
+
+$("micOn").onclick=startMic;$("micOff").onclick=stopMic;
+$("wait").onclick=()=>setMode("WAIT");$("flow").onclick=()=>setMode("FLOW");
+$("restart").onclick=restart;
+$("pause").onclick=()=>{
+ paused=!paused;$("pause").textContent=paused?"Lanjut":"Jeda";
+ clearTimeout(flowTimer);if(!paused&&mode==="FLOW")flow();
+ msg(paused?"Latihan dijeda.":"Latihan lanjut.");
+};
+$("song").onchange=()=>{song=songs[$("song").value];seq=song.n.slice();restart()};
+$("tempo").oninput=()=>{$("tempoText").textContent=$("tempo").value+" BPM"};
+$("transpose").onchange=update;
+$("replay").onclick=()=>{if(target()!==null)play(target(),.55)};
+$("skip").onclick=()=>{if(i<seq.length)i++;update();if(i>=seq.length)finish()};
+$("previous").onclick=()=>{i=Math.max(0,i-1);update()};
+$("test").onclick=()=>play(69,.6);
+$("highlight").onchange=highlight;
+$("showNotes").onchange=drawRoll;$("showNames").onchange=drawRoll;
+$("calibrate").onclick=()=>{
+ if(!analyser){toast("Aktifkan mic dulu.");return}
+ let samples=[],count=0;
+ const take=()=>{
+  if(!analyser||count++>=25){
+   if(samples.length){samples.sort((a,b)=>a-b);noise=Math.max(.002,samples[12]*1.8)}
+   toast("Noise floor dikalibrasi.");return
   }
-  if (audioContext.state === "suspended") {
-    await audioContext.resume();
-  }
-  return audioContext;
-}
+  analyser.getFloatTimeDomainData(buffer);let s=0;
+  for(const v of buffer)s+=v*v;
+  samples.push(Math.sqrt(s/buffer.length));setTimeout(take,40)
+ };take()
+};
+$("fullscreen").onclick=async()=>{
+ try{if(!document.fullscreenElement)await document.documentElement.requestFullscreen();else await document.exitFullscreen()}
+ catch(e){toast("Fullscreen tidak tersedia.")}
+};
+$("help").onclick=()=>alert("Pilih lagu, aktifkan mic, beri izin, lalu mainkan nada target. WAIT menunggu nada yang cocok. Tes dengan instrumen eksternal. Lagu adalah motif latihan, bukan transkripsi lengkap.");
+$("save").onclick=()=>{
+ try{localStorage.setItem("ut40",JSON.stringify({song:$("song").value,i,score,errors,streak,attempts,correct,tempo:$("tempo").value,transpose:$("transpose").value}));toast("Progres disimpan.")}
+ catch(e){toast("Penyimpanan gagal.")}
+};
+$("load").onclick=()=>{
+ try{
+  const d=JSON.parse(localStorage.getItem("ut40")||"null");if(!d)return toast("Belum ada simpanan.");
+  $("song").value=d.song;song=songs[d.song];seq=song.n.slice();
+  i=Math.min(d.i,seq.length);score=d.score;errors=d.errors;streak=d.streak;
+  attempts=d.attempts;correct=d.correct;$("tempo").value=d.tempo;$("transpose").value=d.transpose;
+  update();toast("Progres dimuat.");
+ }catch(e){toast("Gagal memuat progres.")}
+};
+$("export").onclick=()=>{
+ const d={song:$("song").value,score,errors,streak,attempts,correct,accuracy:attempts?correct/attempts:0};
+ const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([JSON.stringify(d,null,2)],{type:"application/json"}));a.download="piano-stats.json";a.click();URL.revokeObjectURL(a.href);
+};
+$("reset").onclick=()=>{score=errors=streak=attempts=correct=0;update();toast("Statistik direset.")};
 
-async function playPianoNote(midi, duration = 0.35, volume = 0.18) {
-  const ctx = await getAudioContext();
-  const now = ctx.currentTime;
-
-  const osc = ctx.createOscillator();
-  const osc2 = ctx.createOscillator();
-  const gain = ctx.createGain();
-
-  osc.type = "triangle";
-  osc.frequency.value = frequencyFromMidi(midi);
-  osc2.type = "sine";
-  osc2.frequency.value = frequencyFromMidi(midi) * 2;
-
-  const overtoneGain = ctx.createGain();
-  overtoneGain.gain.value = 0.22;
-
-  osc.connect(gain);
-  osc2.connect(overtoneGain);
-  overtoneGain.connect(gain);
-  gain.connect(ctx.destination);
-
-  gain.gain.setValueAtTime(0.0001, now);
-  gain.gain.linearRampToValueAtTime(volume, now + 0.012);
-  gain.gain.exponentialRampToValueAtTime(
-    0.0001, now + Math.max(0.08, duration)
-  );
-
-  osc.start(now);
-  osc2.start(now);
-  osc.stop(now + duration + 0.04);
-  osc2.stop(now + duration + 0.04);
-
-  setTimeout(() => {
-    try {
-      osc.disconnect();
-      osc2.disconnect();
-      overtoneGain.disconnect();
-      gain.disconnect();
-    } catch (_) {}
-  }, (duration + 0.15) * 1000);
-}
-
-// ---------- VIRTUAL KEYBOARD ----------
-const keyboard = document.getElementById("keyboard");
-const FIRST_MIDI = 48; // C3
-const LAST_MIDI = 83;  // B5? Range below is C3 through B4: 48–71.
-const WHITE_SEMITONES = new Set([0,2,4,5,7,9,11]);
-const WHITE_MIDIS = [];
-
-for (let midi = 48; midi <= 71; midi++) {
-  if (WHITE_SEMITONES.has(midi % 12)) WHITE_MIDIS.push(midi);
-}
-
-const keyElements = new Map();
-
-function buildKeyboard() {
-  keyboard.innerHTML = "";
-  keyElements.clear();
-
-  const whiteWidth = 100 / WHITE_MIDIS.length;
-
-  WHITE_MIDIS.forEach((midi, index) => {
-    const key = document.createElement("button");
-    key.className = "key";
-    key.type = "button";
-    key.dataset.midi = midi;
-    key.textContent = midiName(midi);
-    key.style.width = whiteWidth + "%";
-    keyElements.set(midi, key);
-    keyboard.appendChild(key);
-
-    key.addEventListener("pointerdown", event => {
-      event.preventDefault();
-      userPlayedNote(midi);
-    });
-  });
-
-  for (let midi = 48; midi <= 71; midi++) {
-    if (WHITE_SEMITONES.has(midi % 12)) continue;
-
-    const previousWhiteMidi = midi - 1;
-    const previousIndex = WHITE_MIDIS.indexOf(previousWhiteMidi);
-    if (previousIndex < 0) continue;
-
-    const key = document.createElement("button");
-    key.className = "key black";
-    key.type = "button";
-    key.dataset.midi = midi;
-    key.textContent = midiName(midi);
-    key.style.left = ((previousIndex + 1) * whiteWidth) + "%";
-    keyElements.set(midi, key);
+buildKeys();update();
+</script>
+</body>
+</html>
+lements.set(midi, key);
     keyboard.appendChild(key);
 
     key.addEventListener("pointerdown", event => {
