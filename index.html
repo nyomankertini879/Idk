@@ -3,273 +3,762 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>Piano Practice</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>Undertale Piano Trainer</title>
 <style>
-*{box-sizing:border-box}
-body{margin:0;background:#101522;color:white;font-family:Arial;overflow:hidden}
-.app{height:100dvh;display:flex;flex-direction:column;padding:7px;gap:7px}
-header{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
-button,select{padding:8px;border:1px solid #44506b;border-radius:8px;background:#202a40;color:white}
-button:active{background:#3c9eac}
-#status{font-size:12px;color:#9fe9df}
-#roll{width:100%;flex:1;min-height:60px;background:#151d2e;border-radius:10px}
-#keyboard{height:30vh;min-height:110px;display:flex;position:relative;background:#fff;overflow:hidden}
-.key{flex:1;min-width:0;background:#fff;color:#111;border:1px solid #999;border-radius:0 0 5px 5px;display:flex;align-items:end;justify-content:center;padding:0 0 6px;font-size:10px}
-.key.black{position:absolute;top:0;height:62%;width:4.2%;background:#090d17;color:white;border:1px solid #555;z-index:2}
-.key.lit{background:#55e6c1!important;color:#111!important}
-footer{font-size:12px;color:#c5d2e8;display:flex;justify-content:space-between}
+:root {
+  color-scheme: dark;
+  --bg: #101116;
+  --panel: #1b1d27;
+  --accent: #ffe45c;
+  --green: #5aff9b;
+  --red: #ff5b6b;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: white;
+  font-family: system-ui, sans-serif;
+  overflow-x: hidden;
+}
+header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 10px 14px;
+  background: #191a22;
+  border-bottom: 1px solid #393b48;
+}
+h1 { font-size: 17px; margin: 0; }
+main { padding: 10px; max-width: 1100px; margin: auto; }
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 10px;
+}
+button, select {
+  border: 1px solid #55596b;
+  background: #292c38;
+  color: white;
+  border-radius: 8px;
+  padding: 9px 12px;
+  font-size: 14px;
+}
+button:active { transform: scale(.97); }
+button.active { background: #675a15; border-color: var(--accent); }
+button:disabled { opacity: .45; }
+.panel {
+  background: var(--panel);
+  border: 1px solid #353846;
+  border-radius: 10px;
+  padding: 10px;
+  margin-bottom: 10px;
+}
+.statusline {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+#micStatus { color: #b9c3d9; overflow-wrap: anywhere; }
+#practiceStatus { color: var(--green); }
+.target {
+  font-size: 24px;
+  font-weight: 800;
+  color: var(--accent);
+}
+.small { color: #a9adbd; font-size: 12px; }
+#visualizer {
+  position: relative;
+  height: 170px;
+  overflow: hidden;
+  border-radius: 8px;
+  background: #08090e;
+  border: 1px solid #373948;
+  margin-bottom: 10px;
+}
+#targetLine {
+  position: absolute;
+  left: 0; right: 0; bottom: 28px;
+  border-top: 2px dashed #666b7d;
+}
+#fallingNotes {
+  position: absolute; inset: 0;
+}
+.fallnote {
+  position: absolute;
+  height: 18px;
+  min-width: 28px;
+  border-radius: 5px;
+  background: var(--accent);
+  color: #171717;
+  font-size: 11px;
+  font-weight: 800;
+  text-align: center;
+  padding: 2px 4px;
+}
+#keyboard {
+  position: relative;
+  display: flex;
+  height: clamp(150px, 30vh, 230px);
+  width: 100%;
+  user-select: none;
+  touch-action: manipulation;
+  margin-top: 10px;
+}
+.key {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  border: 1px solid #8e92a0;
+  border-radius: 0 0 6px 6px;
+  background: #f5f5f5;
+  color: #171717;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding-bottom: 8px;
+  font-size: 11px;
+}
+.key.black {
+  position: absolute;
+  z-index: 2;
+  top: 0;
+  height: 62%;
+  width: 4.2%;
+  min-width: 16px;
+  background: #171923;
+  border: 1px solid #555a6c;
+  border-radius: 0 0 5px 5px;
+  color: white;
+  padding-bottom: 5px;
+  transform: translateX(-50%);
+}
+.key.pressed { background: #ffe45c; color: #111; }
+.key.black.pressed { background: #f2b93e; }
+.key.correct { box-shadow: inset 0 0 0 4px #26bd70; }
+#micMeter {
+  height: 7px;
+  background: #333644;
+  border-radius: 9px;
+  overflow: hidden;
+  margin-top: 7px;
+}
+#micLevel {
+  height: 100%;
+  width: 0;
+  background: var(--green);
+  transition: width .06s;
+}
+@media (orientation: portrait) {
+  header h1 { font-size: 14px; }
+  main { padding: 7px; }
+  #visualizer { height: 130px; }
+  button, select { padding: 8px 9px; font-size: 12px; }
+}
 </style>
 </head>
 <body>
-<div class="app">
 <header>
-<strong>🎹 PIANO</strong>
-<select id="song">
-<option value="finale">Finale - latihan</option>
-<option value="scale">C Major Scale</option>
-</select>
-<button id="start">▶ Mulai</button>
-<button id="mic">🎙 Mic</button>
-<button id="test">Test Mic OFF</button>
-<button id="full">⛶</button>
+  <h1>UNDERTALE · PIANO TRAINER</h1>
+  <button id="fullscreenBtn">Fullscreen</button>
 </header>
-<div id="status">Tekan Mulai untuk memulai.</div>
-<canvas id="roll"></canvas>
-<div id="keyboard"></div>
-<footer><span id="pitch">Nada: —</span><span id="count">0 not</span></footer>
-</div>
+
+<main>
+  <div class="toolbar">
+    <label for="songSelect">Lagu:</label>
+    <select id="songSelect">
+      <option value="finale">Finale — latihan</option>
+      <option value="mega">Megalovania — latihan</option>
+      <option value="best">Your Best Friend — latihan</option>
+      <option value="asgore">Asgore — latihan</option>
+      <option value="scale">C Major Scale</option>
+    </select>
+    <button id="startBtn">Mulai / Ulangi</button>
+    <button id="waitBtn" class="active">WAIT: ON</button>
+    <button id="flowBtn">FLOW: OFF</button>
+  </div>
+
+  <section class="panel">
+    <div class="statusline">
+      <div>
+        <div class="small">NADA YANG DITUNGGU</div>
+        <div id="targetNote" class="target">C4</div>
+      </div>
+      <div>
+        <div class="small">PROGRES</div>
+        <strong id="progress">0 / 0</strong>
+      </div>
+      <div>
+        <div class="small">MICROPHONE</div>
+        <div id="micStatus">Belum aktif</div>
+      </div>
+    </div>
+    <div id="micMeter"><div id="micLevel"></div></div>
+    <div class="toolbar" style="margin-top:10px;margin-bottom:0">
+      <button id="micBtn">Aktifkan Mic</button>
+      <button id="stopMicBtn">Matikan Mic</button>
+      <button id="testToneBtn">Tes Suara Piano</button>
+    </div>
+    <div id="practiceStatus" style="margin-top:9px">Siap latihan.</div>
+    <div class="small" style="margin-top:6px">
+      WAIT: nada berikutnya baru maju setelah nada yang benar dimainkan.
+      Pakai headphone jika suara speaker terbaca kembali oleh mic.
+    </div>
+  </section>
+
+  <div id="visualizer">
+    <div id="fallingNotes"></div>
+    <div id="targetLine"></div>
+  </div>
+
+  <section class="panel">
+    <div class="statusline">
+      <strong>Piano virtual C3–B4</strong>
+      <span class="small">Ketuk tuts atau gunakan keyboard komputer.</span>
+    </div>
+    <div id="keyboard"></div>
+  </section>
+</main>
+
 <script>
-const $=id=>document.getElementById(id);
-const names=['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'];
-const low=48,high=72;
-let audio,master,analyser,data,stream;
-let micOn=false,testOn=false,playing=false,begin=0;
-let song=[],hit=-1,raf;
-const melodies={
-finale:[
-['D4',0,.5],['F4',.5,.5],['A4',1,.6],
-['G4',1.7,.4],['F4',2.1,.4],['D4',2.5,.7],
-['C4',3.3,.4],['D4',3.8,.4],['F4',4.3,.6],
-['E4',5,.4],['D4',5.5,.7],['A3',6.3,.5],
-['C4',6.8,.5],['D4',7.3,.6],['F4',8,.5],
-['G4',8.5,.5],['A4',9,.9]
-],
-scale:[
-['C4',0,.5],['D4',.5,.5],['E4',1,.5],
-['F4',1.5,.5],['G4',2,.5],['A4',2.5,.5],
-['B4',3,.5],['C5',3.5,1]
-]};
-function midi(s){
-let m=s.match(/^([A-G])(#?)(-?\d+)$/);
-return (Number(m[3])+1)*12+names.indexOf(m[1]+m[2]);
-}
-function note(n){return names[n%12]+(Math.floor(n/12)-1)}
-function hz(n){return 440*Math.pow(2,(n-69)/12)}
-function buildKeys(){
-const el=$('keyboard');el.innerHTML='';
-let whites=[];
-for(let n=low;n<=high;n++)if(!names[n%12].includes('#'))whites.push(n);
-whites.forEach((n,i)=>{
-let b=document.createElement('button');
-b.className='key';b.dataset.n=n;b.textContent=note(n);
-b.addEventListener('pointerdown',e=>{
-e.preventDefault();playNote(n);light(n);
-if(testOn)check(n);
-});
-el.appendChild(b);
-});
-whites.forEach((n,i)=>{
-let s=n+1;
-if(s<=high&&names[s%12].includes('#')){
-let b=document.createElement('button');
-b.className='key black';b.dataset.n=s;
-b.textContent=note(s);
-b.style.left=((i+1)*100/whites.length-1.3)+'%';
-b.addEventListener('pointerdown',e=>{
-e.preventDefault();e.stopPropagation();
-playNote(s);light(s);if(testOn)check(s);
-});
-el.appendChild(b);
-}
-});
-}
-function light(n){
-let k=$('keyboard').querySelector(`[data-n="${n}"]`);
-if(!k)return;
-k.classList.add('lit');
-setTimeout(()=>k.classList.remove('lit'),220);
-}
-async function initAudio(){
-if(!audio){
-audio=new(window.AudioContext||window.webkitAudioContext)();
-master=audio.createGain();master.gain.value=.5;
-master.connect(audio.destination);
-}
-if(audio.state==='suspended')await audio.resume();
-}
-function playNote(n){
-if(!audio)return;
-let o=audio.createOscillator(),g=audio.createGain();
-o.type='triangle';o.frequency.value=hz(n);
-g.gain.setValueAtTime(.2,audio.currentTime);
-g.gain.exponentialRampToValueAtTime(.001,audio.currentTime+.7);
-o.connect(g);g.connect(master);
-o.start();o.stop(audio.currentTime+.72);
-}
-function setSong(){
-song=melodies[$('song').value].map(x=>({n:midi(x[0]),t:x[1],d:x[2]}));
-hit=-1;$('count').textContent='0 / '+song.length;
-draw(0);
-}
-function check(n){
-let i=song.findIndex((x,j)=>j>hit&&x.n===n);
-if(i>=0){hit=i;$('count').textContent=(hit+1)+' / '+song.length;}
-}
-function detect(buf,sr){
-let size=buf.length,rms=0;
-for(let x of buf)rms+=x*x;
-rms=Math.sqrt(rms/size);
-if(rms<.015)return null;
-let bestLag=0,best=-1;
-for(let lag=Math.floor(sr/1000);lag<Math.min(sr/65,size/2);lag++){
-let sum=0;
-for(let i=0;i<size-lag;i++)sum+=buf[i]*buf[i+lag];
-sum/=size-lag;
-if(sum>best){best=sum;bestLag=lag;}
-}
-if(best<.5||!bestLag)return null;
-let f=sr/bestLag;
-return f>55&&f<1100?f:null;
-}
-async function enableMic(){
-try{
-await initAudio();
-stream=await navigator.mediaDevices.getUserMedia({
-audio:{echoCancellation:false,noiseSuppression:false}
-});
-let src=audio.createMediaStreamSource(stream);
-analyser=audio.createAnalyser();analyser.fftSize=4096;
-src.connect(analyser);data=new Float32Array(analyser.fftSize);
-micOn=true;$('status').textContent='Mic aktif. Mainkan piano.';
-}catch(e){
-$('status').textContent='Mic gagal. Gunakan HTTPS dan izinkan mikrofon.';
-}
-}
-function micLoop(){
-if(micOn&&analyser){
-analyser.getFloatTimeDomainData(data);
-let f=detect(data,audio.sampleRate);
-if(f){
-let n=Math.round(69+12*Math.log2(f/440));
-$('pitch').textContent='Nada: '+note(n)+' ('+f.toFixed(0)+' Hz)';
-if(testOn&&n>=low&&n<=high){light(n);check(n);}
-}else $('pitch').textContent='Nada: —';
-}
-requestAnimationFrame(micLoop);
-}
-function draw(t){
-let c=$('roll'),r=c.getBoundingClientRect();
-let dpr=devicePixelRatio||1;
-if(c.width!==Math.floor(r.width*dpr)||c.height!==Math.floor(r.height*dpr)){
-c.width=Math.floor(r.width*dpr);c.height=Math.floor(r.height*dpr);
-}
-let x=c.getContext('2d');x.setTransform(dpr,0,0,dpr,0,0);
-let w=r.width,h=r.height;
-x.clearRect(0,0,w,h);
-let whites=[];
-for(let n=low;n<=high;n++)if(!names[n%12].includes('#'))whites.push(n);
-let xpos=n=>{
-let i=whites.indexOf(n);
-if(i<0)i=whites.indexOf(n-1)+.7;
-return (i+.5)*w/whites.length;
-};
-x.strokeStyle='#ffd166';x.lineWidth=2;
-x.beginPath();x.moveTo(0,h-8);x.lineTo(w,h-8);x.stroke();
-song.forEach((nt,i)=>{
-let dt=nt.t-t+4;
-if(dt<0||dt>6)return;
-let y=h-8-dt*45,bw=w/whites.length*.65;
-x.fillStyle=i<=hit?'#79e2d0':'#55c8e8';
-x.beginPath();x.roundRect(xpos(nt.n)-bw/2,y-nt.d*35,bw,nt.d*35,4);x.fill();
-});
-if(playing){
-let elapsed=(performance.now()-begin)/1000;
-if(elapsed>song[song.length-1].t+song[song.length-1].d+1){
-playing=false;$('start').textContent='▶ Ulangi';
-$('status').textContent='Selesai! Kamu bisa mengulangi latihan.';return;
-}
-raf=requestAnimationFrame(()=>draw(elapsed));
-}
-}
-$('start').onclick=async()=>{
-await initAudio();
-if(playing){playing=false;cancelAnimationFrame(raf);$('start').textContent='▶ Lanjut';return;}
-playing=true;begin=performance.now();
-$('start').textContent='Ⅱ Jeda';draw(0);
-$('status').textContent='Latihan berjalan. Ikuti balok not.';
-};
-$('mic').onclick=enableMic;
-$('test').onclick=()=>{
-testOn=!testOn;
-$('test').textContent='Test Mic '+(testOn?'ON':'OFF');
-};
-$('full').onclick=async()=>{
-try{
-if(!document.fullscreenElement)await document.documentElement.requestFullscreen();
-else await document.exitFullscreen();
-}catch(e){$('status').textContent='Putar HP ke landscape untuk tampilan terbaik.';}
-};
-$('song').onchange=setSong;
-buildKeys();setSong();micLoop();
-window.addEventListener('resize',()=>draw(playing?(performance.now()-begin)/1000:0));
-</script>
-</body>
-</html>
-}, {name: 'A3', type: 'white', freq: 220.00}, {name: 'A#3', type: 'black', freq: 233.08}, {name: 'B3', type: 'white', freq: 246.94},
-            {name: 'C4', type: 'white', freq: 261.63}, {name: 'C#4', type: 'black', freq: 277.18}, {name: 'D4', type: 'white', freq: 293.66}, {name: 'D#4', type: 'black', freq: 311.13}, {name: 'E4', type: 'white', freq: 329.63},
-            {name: 'F4', type: 'white', freq: 349.23}, {name: 'F#4', type: 'black', freq: 369.99}, {name: 'G4', type: 'white', freq: 392.00}, {name: 'G#4', type: 'black', freq: 415.30}, {name: 'A4', type: 'white', freq: 440.00}, {name: 'A#4', type: 'black', freq: 466.16}, {name: 'B4', type: 'white', freq: 493.88}
-        ];
+"use strict";
 
-        function initPianoUI() {
-            const container = document.getElementById('piano-container');
-            container.innerHTML = '';
-            let whiteIndex = 0;
-            notesList.forEach((n) => {
-                const keyEl = document.createElement('div');
-                keyEl.className = `key ${n.type}`;
-                keyEl.dataset.note = n.name;
-                if (n.type === 'white') {
-                    keyEl.style.left = (whiteIndex * 32) + 'px';
-                    whiteIndex++;
-                } else {
-                    keyEl.style.left = ((whiteIndex * 32) - 10) + 'px';
-                }
-                keyEl.addEventListener('pointerdown', (e) => {
-                    e.preventDefault();
-                    triggerNote(n.name);
-                });
-                container.appendChild(keyEl);
-            });
+// ---------- MUSIK DAN PITCH ----------
+const NOTE_NAMES = [
+  "C", "C#", "D", "D#", "E", "F",
+  "F#", "G", "G#", "A", "A#", "B"
+];
+
+function midiName(midi) {
+  return NOTE_NAMES[((midi % 12) + 12) % 12] +
+    (Math.floor(midi / 12) - 1);
+}
+
+function frequencyFromMidi(midi) {
+  return 440 * Math.pow(2, (midi - 69) / 12);
+}
+
+// MIDI numbers. These are practice motifs, not full sheet transcriptions.
+const SONGS = {
+  finale: {
+    name: "Finale — latihan",
+    bpm: 190,
+    notes: [
+      [72,1],[74,1],[75,1],[77,2],[75,1],[72,2],
+      [70,1],[72,1],[74,1],[75,2],[79,2],[77,1],
+      [75,1],[74,1],[72,2],[70,2],[72,1],[74,1],
+      [75,1],[77,2],[75,1],[74,1],[72,2]
+    ]
+  },
+  mega: {
+    name: "Megalovania — latihan",
+    bpm: 120,
+    notes: [
+      [62,1],[62,1],[69,2],[65,2],[64,2],
+      [62,1],[65,1],[69,2],[72,2],[71,1],
+      [69,1],[65,1],[62,1],[64,1],[65,1],
+      [60,1],[60,1],[69,2],[65,2],[64,2],
+      [62,1],[65,1],[69,2],[72,2],[71,1],
+      [69,1],[65,1],[62,1],[64,1],[65,1]
+    ]
+  },
+  best: {
+    name: "Your Best Friend — latihan",
+    bpm: 125,
+    notes: [
+      [60,1],[64,1],[67,1],[69,1],[67,1],[64,1],
+      [60,1],[64,1],[67,1],[72,2],[71,1],[69,1],
+      [67,1],[64,1],[62,1],[60,2]
+    ]
+  },
+  asgore: {
+    name: "Asgore — latihan",
+    bpm: 110,
+    notes: [
+      [48,2],[55,1],[60,1],[63,2],[62,1],[60,1],
+      [58,2],[55,1],[58,1],[60,2],[63,1],[65,1],
+      [67,2],[65,1],[63,1],[60,2],[58,1],[55,1]
+    ]
+  },
+  scale: {
+    name: "C Major Scale",
+    bpm: 90,
+    notes: [
+      [60,1],[62,1],[64,1],[65,1],[67,1],[69,1],
+      [71,1],[72,1],[71,1],[69,1],[67,1],[65,1],
+      [64,1],[62,1],[60,2]
+    ]
+  }
+};
+
+// ---------- AUDIO PIANO ----------
+let audioContext = null;
+
+async function getAudioContext() {
+  if (!audioContext || audioContext.state === "closed") {
+    audioContext = new (window.AudioContext ||
+      window.webkitAudioContext)();
+  }
+  if (audioContext.state === "suspended") {
+    await audioContext.resume();
+  }
+  return audioContext;
+}
+
+async function playPianoNote(midi, duration = 0.35, volume = 0.18) {
+  const ctx = await getAudioContext();
+  const now = ctx.currentTime;
+
+  const osc = ctx.createOscillator();
+  const osc2 = ctx.createOscillator();
+  const gain = ctx.createGain();
+
+  osc.type = "triangle";
+  osc.frequency.value = frequencyFromMidi(midi);
+  osc2.type = "sine";
+  osc2.frequency.value = frequencyFromMidi(midi) * 2;
+
+  const overtoneGain = ctx.createGain();
+  overtoneGain.gain.value = 0.22;
+
+  osc.connect(gain);
+  osc2.connect(overtoneGain);
+  overtoneGain.connect(gain);
+  gain.connect(ctx.destination);
+
+  gain.gain.setValueAtTime(0.0001, now);
+  gain.gain.linearRampToValueAtTime(volume, now + 0.012);
+  gain.gain.exponentialRampToValueAtTime(
+    0.0001, now + Math.max(0.08, duration)
+  );
+
+  osc.start(now);
+  osc2.start(now);
+  osc.stop(now + duration + 0.04);
+  osc2.stop(now + duration + 0.04);
+
+  setTimeout(() => {
+    try {
+      osc.disconnect();
+      osc2.disconnect();
+      overtoneGain.disconnect();
+      gain.disconnect();
+    } catch (_) {}
+  }, (duration + 0.15) * 1000);
+}
+
+// ---------- VIRTUAL KEYBOARD ----------
+const keyboard = document.getElementById("keyboard");
+const FIRST_MIDI = 48; // C3
+const LAST_MIDI = 83;  // B5? Range below is C3 through B4: 48–71.
+const WHITE_SEMITONES = new Set([0,2,4,5,7,9,11]);
+const WHITE_MIDIS = [];
+
+for (let midi = 48; midi <= 71; midi++) {
+  if (WHITE_SEMITONES.has(midi % 12)) WHITE_MIDIS.push(midi);
+}
+
+const keyElements = new Map();
+
+function buildKeyboard() {
+  keyboard.innerHTML = "";
+  keyElements.clear();
+
+  const whiteWidth = 100 / WHITE_MIDIS.length;
+
+  WHITE_MIDIS.forEach((midi, index) => {
+    const key = document.createElement("button");
+    key.className = "key";
+    key.type = "button";
+    key.dataset.midi = midi;
+    key.textContent = midiName(midi);
+    key.style.width = whiteWidth + "%";
+    keyElements.set(midi, key);
+    keyboard.appendChild(key);
+
+    key.addEventListener("pointerdown", event => {
+      event.preventDefault();
+      userPlayedNote(midi);
+    });
+  });
+
+  for (let midi = 48; midi <= 71; midi++) {
+    if (WHITE_SEMITONES.has(midi % 12)) continue;
+
+    const previousWhiteMidi = midi - 1;
+    const previousIndex = WHITE_MIDIS.indexOf(previousWhiteMidi);
+    if (previousIndex < 0) continue;
+
+    const key = document.createElement("button");
+    key.className = "key black";
+    key.type = "button";
+    key.dataset.midi = midi;
+    key.textContent = midiName(midi);
+    key.style.left = ((previousIndex + 1) * whiteWidth) + "%";
+    keyElements.set(midi, key);
+    keyboard.appendChild(key);
+
+    key.addEventListener("pointerdown", event => {
+      event.preventDefault();
+      userPlayedNote(midi);
+    });
+  }
+}
+
+function flashKey(midi, className = "pressed") {
+  const key = keyElements.get(midi);
+  if (!key) return;
+
+  key.classList.add(className);
+  setTimeout(() => key.classList.remove(className), 180);
+}
+
+async function userPlayedNote(midi) {
+  flashKey(midi);
+  await playPianoNote(midi);
+
+  // For virtual keys, use the same note-confirmation path as mic.
+  acceptNote(midi, "piano");
+}
+
+// Computer keyboard mapping for convenient testing.
+const COMPUTER_KEYS = {
+  a:60, w:61, s:62, e:63, d:64, f:65, t:66,
+  g:67, y:68, h:69, u:70, j:71, k:72
+};
+
+window.addEventListener("keydown", event => {
+  if (event.repeat || event.target.matches("input, select, textarea")) return;
+  const midi = COMPUTER_KEYS[event.key.toLowerCase()];
+  if (midi !== undefined) userPlayedNote(midi);
+});
+
+// ---------- WAIT / FLOW PRACTICE ----------
+let mode = "WAIT";
+let song = SONGS.finale;
+let noteIndex = 0;
+let flowTimer = null;
+let lastMicAccepted = 0;
+let lastMicMidi = null;
+let sameNoteSince = 0;
+
+const targetNoteEl = document.getElementById("targetNote");
+const progressEl = document.getElementById("progress");
+const practiceStatus = document.getElementById("practiceStatus");
+const fallingNotes = document.getElementById("fallingNotes");
+
+function currentTarget() {
+  if (noteIndex >= song.notes.length) return null;
+  return song.notes[noteIndex][0];
+}
+
+function updatePracticeUI() {
+  const target = currentTarget();
+  targetNoteEl.textContent = target === null ? "Selesai!" : midiName(target);
+  progressEl.textContent = `${Math.min(noteIndex, song.notes.length)} / ${song.notes.length}`;
+
+  document.getElementById("waitBtn").classList.toggle("active", mode === "WAIT");
+  document.getElementById("flowBtn").classList.toggle("active", mode === "FLOW");
+  document.getElementById("waitBtn").textContent = mode === "WAIT" ? "WAIT: ON" : "WAIT: OFF";
+  document.getElementById("flowBtn").textContent = mode === "FLOW" ? "FLOW: ON" : "FLOW: OFF";
+
+  renderFallingNotes();
+}
+
+function setMode(nextMode) {
+  mode = nextMode;
+  clearTimeout(flowTimer);
+  flowTimer = null;
+
+  practiceStatus.textContent = mode === "WAIT"
+    ? "WAIT aktif — mainkan nada yang ditampilkan."
+    : "FLOW aktif — nada bergerak mengikuti tempo.";
+
+  updatePracticeUI();
+  if (mode === "FLOW") scheduleFlowNote();
+}
+
+function acceptNote(midi, source) {
+  if (noteIndex >= song.notes.length) return;
+
+  if (mode === "WAIT") {
+    if (midi === currentTarget()) {
+      flashKey(midi, "correct");
+      noteIndex++;
+      practiceStatus.textContent =
+        "Benar! " + midiName(midi) + " — lanjut ke nada berikutnya.";
+      updatePracticeUI();
+
+      if (noteIndex >= song.notes.length) {
+        practiceStatus.textContent = "Lagu selesai! Tekan Mulai / Ulangi.";
+      }
+    } else if (source === "mic") {
+      practiceStatus.textContent =
+        `Terdengar ${midiName(midi)} — tunggu ${midiName(currentTarget())}.`;
+    }
+  }
+}
+
+function scheduleFlowNote() {
+  if (mode !== "FLOW" || noteIndex >= song.notes.length) return;
+
+  const [midi, beats] = song.notes[noteIndex];
+  flashKey(midi);
+  playPianoNote(midi, 0.22);
+
+  noteIndex++;
+  updatePracticeUI();
+
+  if (noteIndex >= song.notes.length) {
+    practiceStatus.textContent = "Lagu selesai!";
+    return;
+  }
+
+  flowTimer = setTimeout(
+    scheduleFlowNote,
+    (60000 / song.bpm) * beats
+  );
+}
+
+function restartSong() {
+  clearTimeout(flowTimer);
+  flowTimer = null;
+  noteIndex = 0;
+  lastMicAccepted = 0;
+  updatePracticeUI();
+  practiceStatus.textContent = "Mulai dari awal.";
+  if (mode === "FLOW") scheduleFlowNote();
+}
+
+document.getElementById("waitBtn").addEventListener("click", () => setMode("WAIT"));
+document.getElementById("flowBtn").addEventListener("click", () => setMode("FLOW"));
+document.getElementById("startBtn").addEventListener("click", restartSong);
+
+document.getElementById("songSelect").addEventListener("change", event => {
+  song = SONGS[event.target.value];
+  restartSong();
+});
+
+// ---------- FALLING NOTE VISUALIZER ----------
+function renderFallingNotes() {
+  fallingNotes.innerHTML = "";
+  if (!song.notes.length) return;
+
+  const count = Math.min(10, song.notes.length - noteIndex);
+  for (let i = 0; i < count; i++) {
+    const [midi] = song.notes[noteIndex + i];
+    const el = document.createElement("div");
+    el.className = "fallnote";
+    el.textContent = midiName(midi);
+    el.style.left = (8 + (i % 7) * 13) + "%";
+    el.style.top = (8 + i * 14) + "px";
+    fallingNotes.appendChild(el);
+  }
+}
+
+// ---------- MICROPHONE PITCH DETECTION ----------
+let micStream = null;
+let micContext = null;
+let micAnalyser = null;
+let micSource = null;
+let micBuffer = null;
+let micRaf = null;
+let micRunning = false;
+
+const micStatus = document.getElementById("micStatus");
+const micLevel = document.getElementById("micLevel");
+
+async function startMicDetection() {
+  try {
+    stopMicDetection();
+
+    if (!navigator.mediaDevices ||
+        !navigator.mediaDevices.getUserMedia) {
+      throw new Error("Browser perlu HTTPS atau localhost untuk akses mic.");
+    }
+
+    micStatus.textContent = "Meminta izin mikrofon...";
+
+    micStream = await navigator.mediaDevices.getUserMedia({
+      audio: {
+        echoCancellation: false,
+        noiseSuppression: false,
+        autoGainControl: false
+      }
+    });
+
+    micContext = new (window.AudioContext || window.webkitAudioContext)();
+    await micContext.resume();
+
+    micAnalyser = micContext.createAnalyser();
+    micAnalyser.fftSize = 8192;
+    micAnalyser.smoothingTimeConstant = 0;
+
+    micSource = micContext.createMediaStreamSource(micStream);
+    micSource.connect(micAnalyser);
+
+    micBuffer = new Float32Array(micAnalyser.fftSize);
+    micRunning = true;
+    micStatus.textContent = "Mic aktif — mainkan satu nada.";
+    micLoop();
+  } catch (error) {
+    console.error(error);
+    micStatus.textContent = "Mic error: " + error.message;
+    practiceStatus.textContent =
+      "Tidak bisa membuka mic. Periksa izin browser dan koneksi HTTPS.";
+  }
+}
+
+function stopMicDetection() {
+  micRunning = false;
+  if (micRaf !== null) cancelAnimationFrame(micRaf);
+  micRaf = null;
+
+  if (micStream) {
+    micStream.getTracks().forEach(track => track.stop());
+  }
+
+  if (micContext && micContext.state !== "closed") {
+    micContext.close().catch(() => {});
+  }
+
+  micStream = null;
+  micContext = null;
+  micAnalyser = null;
+  micSource = null;
+  micBuffer = null;
+  micLevel.style.width = "0%";
+}
+
+function micLoop() {
+  if (!micRunning || !micAnalyser) return;
+
+  micAnalyser.getFloatTimeDomainData(micBuffer);
+
+  let sum = 0;
+  for (let i = 0; i < micBuffer.length; i++) {
+    sum += micBuffer[i] * micBuffer[i];
+  }
+  const rms = Math.sqrt(sum / micBuffer.length);
+  micLevel.style.width = Math.min(100, rms * 900) + "%";
+
+  if (rms < 0.008) {
+    micStatus.textContent = "Mic aktif — menunggu suara...";
+    lastMicMidi = null;
+    sameNoteSince = 0;
+  } else {
+    const result = autoCorrelate(micBuffer, micContext.sampleRate);
+
+    if (result.frequency > 45 &&
+        result.frequency < 1500 &&
+        result.confidence > 0.72) {
+      const midi = Math.round(
+        69 + 12 * Math.log2(result.frequency / 440)
+      );
+
+      micStatus.textContent =
+        `${midiName(midi)} · ${result.frequency.toFixed(1)} Hz`;
+
+      const now = performance.now();
+      if (midi === lastMicMidi) {
+        if (sameNoteSince === 0) sameNoteSince = now;
+
+        // Require a stable pitch briefly to reduce false triggers.
+        if (now - sameNoteSince > 100 &&
+            now - lastMicAccepted > 300) {
+          lastMicAccepted = now;
+          acceptNote(midi, "mic");
         }
+      } else {
+        lastMicMidi = midi;
+        sameNoteSince = now;
+      }
+    } else {
+      micStatus.textContent = "Suara masuk — mencari nada yang stabil...";
+      lastMicMidi = null;
+      sameNoteSince = 0;
+    }
+  }
 
-        // Tangani Tombol Mulai dengan pointerdown agar sangat responsif
-        async function handleStartApp(e) {
-            e.preventDefault();
-            try {
-                const docEl = document.documentElement;
-                if (docEl.requestFullscreen) await docEl.requestFullscreen();
-                if (screen.orientation && screen.orientation.lock) {
-                    await screen.orientation.lock('landscape').catch(() => {});
-                }
-            } catch (err) {}
+  micRaf = requestAnimationFrame(micLoop);
+}
 
-            try {
-                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-                if (audioCtx.state === 'suspended') await audioCtx.resume();
+function autoCorrelate(buffer, sampleRate) {
+  const size = buffer.length;
+  let bestOffset = -1;
+  let bestCorrelation = 0;
+  let previousCorrelation = 1;
+  let found = false;
 
-                micStream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
-                const source = audioCtx.createMediaStreamSource(micStream);
+  for (let offset = 32; offset < size / 2; offset++) {
+    let difference = 0;
+
+    for (let i = 0; i < size / 2; i++) {
+      difference += Math.abs(buffer[i] - buffer[i + offset]);
+    }
+
+    const correlation = 1 - difference / (size / 2);
+
+    if (correlation > 0.9 && correlation > previousCorrelation) {
+      found = true;
+      if (correlation > bestCorrelation) {
+        bestCorrelation = correlation;
+        bestOffset = offset;
+      }
+    } else if (found) {
+      break;
+    }
+
+    previousCorrelation = correlation;
+  }
+
+  if (bestOffset === -1) {
+    return { frequency: -1, confidence: 0 };
+  }
+
+  // Parabolic interpolation improves pitch accuracy.
+  const left = Math.max(0, bestOffset - 1);
+  const right = Math.min(size - 1, bestOffset + 1);
+
+  let refinedOffset = bestOffset;
+  if (left !== bestOffset && right !== bestOffset) {
+    const correlationAt = offset => {
+      let difference = 0;
+      for (let i = 0; i < size / 2; i++) {
+        difference += Math.abs(buffer[i] - buffer[i + offset]);
+      }
+      return 1 - difference / (size / 2);
+    };
+
+    const y1 = correlationAt(left);
+    const y2 = correlationAt(bestOffset);
+    const y3 = correlationAt(right);
+    const denominator = y1 - 2 * y2 + y3;
+
+    if (Math.abs(denominator) > 1e-8) {
+      refinedOffset += 0.5 * (y1 - y3) / denominator;
+    }
+  }
+
+  return {
+    frequency: sampleRate / refinedOffset,
+    confidence: bestCorrelation
+  };
+}
+
+document.getElementById("micBtn").addEventListener("click", startMicDetection);
+document.getElementById("stopMicBtn").addEventListener("click", () => {
+  stopMicDetection();
+  micStatus.textContent = "Mic dimatikan.";
+});
+
+document.getElementById("testToneBtn").addEventListener("click", async () => {
+  await playPianoNote(69, 0.oCtx.createMediaStreamSource(micStream);
                 analyser = audioCtx.createAnalyser();
                 analyser.fftSize = 2048;
                 source.connect(analyser);
