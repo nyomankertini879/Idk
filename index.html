@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Undertale Piano Studio (Mobile Landscape)</title>
+    <title>Undertale Piano Studio</title>
     <style>
         * {
             box-sizing: border-box;
@@ -15,28 +15,25 @@
             padding: 0;
             width: 100vw;
             height: 100vh;
-            background: #0b0f19;
+            background: #090d16;
             color: #f3f4f6;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             overflow: hidden;
             display: flex;
             flex-direction: column;
         }
 
-        /* Modal Izin & Interaksi Utama */
+        /* Modal Izin & Start */
         #permission-modal {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
+            top: 0; left: 0; width: 100vw; height: 100vh;
             background: rgba(5, 7, 12, 0.98);
-            z-index: 2147483647; /* Nilai z-index tertinggi agar selalu bisa diklik */
+            z-index: 99999;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            padding: 24px;
+            padding: 20px;
             text-align: center;
         }
         .modal-card {
@@ -44,14 +41,14 @@
             border: 2px solid #3b82f6;
             border-radius: 16px;
             padding: 24px;
-            max-width: 420px;
+            max-width: 400px;
             width: 100%;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.8);
         }
         .modal-card h2 {
             margin-top: 0;
             color: #60a5fa;
-            font-size: 1.3rem;
+            font-size: 1.2rem;
         }
         .modal-card p {
             font-size: 0.85rem;
@@ -63,25 +60,21 @@
             background: linear-gradient(135deg, #3b82f6, #1d4ed8);
             color: white;
             border: none;
-            padding: 16px 24px;
-            font-size: 1.05rem;
+            padding: 14px 20px;
+            font-size: 1rem;
             font-weight: bold;
-            border-radius: 12px;
+            border-radius: 10px;
             cursor: pointer;
             width: 100%;
-            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.5);
-            -webkit-tap-highlight-color: transparent;
-        }
-        .btn-primary:active {
-            transform: scale(0.97);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
         }
 
         /* Peringatan Portret */
         #orientation-warning {
             position: fixed;
             top: 0; left: 0; width: 100vw; height: 100vh;
-            background: #0b0f19;
-            z-index: 2147483646;
+            background: #090d16;
+            z-index: 99998;
             display: none;
             flex-direction: column;
             justify-content: center;
@@ -101,7 +94,7 @@
             width: 100%;
             height: 100%;
             padding: 6px;
-            gap: 6px;
+            gap: 5px;
         }
 
         header {
@@ -109,42 +102,46 @@
             justify-content: space-between;
             align-items: center;
             background: #111827;
-            padding: 6px 12px;
-            border-radius: 8px;
+            padding: 4px 10px;
+            border-radius: 6px;
             border: 1px solid #1f2937;
-            min-height: 42px;
+            height: 38px;
         }
         .app-title {
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             font-weight: bold;
             color: #38bdf8;
         }
         .controls-group {
             display: flex;
-            gap: 6px;
+            gap: 5px;
             align-items: center;
         }
         select, button.ctrl-btn {
             background: #1f2937;
             color: #e5e7eb;
             border: 1px solid #374151;
-            padding: 4px 8px;
-            border-radius: 6px;
-            font-size: 0.75rem;
+            padding: 3px 8px;
+            border-radius: 5px;
+            font-size: 0.7rem;
             cursor: pointer;
         }
         button.ctrl-btn.active {
             background: #059669;
             border-color: #10b981;
         }
+        button.ctrl-btn.test-active {
+            background: #7c3aed;
+            border-color: #8b5cf6;
+        }
 
         .metrics-bar {
             display: flex;
             justify-content: space-around;
             background: #111827;
-            padding: 4px;
+            padding: 3px;
             border-radius: 6px;
-            font-size: 0.7rem;
+            font-size: 0.68rem;
             border: 1px solid #1f2937;
         }
         .metric-item span {
@@ -152,13 +149,15 @@
             font-weight: bold;
         }
 
+        /* Canvas Area */
         #canvas-container {
             flex: 1;
             background: #030712;
-            border-radius: 8px;
+            border-radius: 6px;
             border: 1px solid #1f2937;
             position: relative;
             overflow: hidden;
+            min-height: 80px;
         }
         canvas {
             width: 100%;
@@ -166,10 +165,11 @@
             display: block;
         }
 
+        /* Area Tuts Piano Virtual */
         #piano-container {
-            height: 110px;
+            height: 95px;
             background: #111827;
-            border-radius: 8px;
+            border-radius: 6px;
             border: 1px solid #1f2937;
             display: flex;
             position: relative;
@@ -181,18 +181,18 @@
             position: relative;
             background: #f9fafb;
             border: 1px solid #9ca3af;
-            border-bottom-left-radius: 4px;
-            border-bottom-right-radius: 4px;
+            border-bottom-left-radius: 3px;
+            border-bottom-right-radius: 3px;
             height: 100%;
             flex: 1;
-            max-width: 32px;
-            min-width: 18px;
+            max-width: 30px;
+            min-width: 16px;
             cursor: pointer;
             display: flex;
             align-items: flex-end;
             justify-content: center;
-            padding-bottom: 4px;
-            font-size: 8px;
+            padding-bottom: 3px;
+            font-size: 7px;
             color: #374151;
         }
         .key.black {
@@ -200,36 +200,40 @@
             color: #9ca3af;
             border-color: #000;
             position: absolute;
-            height: 58%;
+            height: 56%;
             z-index: 2;
-            max-width: 18px;
-            min-width: 11px;
-            border-radius: 0 0 4px 4px;
+            max-width: 16px;
+            min-width: 10px;
+            border-radius: 0 0 3px 3px;
         }
         .key.pressed {
             background: #38bdf8 !important;
             color: #0f172a !important;
         }
+        .key.mic-detected {
+            background: #7c3aed !important;
+            color: #ffffff !important;
+        }
     </style>
 </head>
 <body>
 
-    <!-- Modal Utama: Wajib disentuh untuk mengizinkan mic & fullscreen sekaligus -->
+    <!-- Modal Utama -->
     <div id="permission-modal">
         <div class="modal-card">
             <h2>🎹 Undertale Piano Studio</h2>
-            <p>Ketuk tombol di bawah untuk mengaktifkan mikrofon, masuk ke layar penuh, dan memutar tampilan ke mode *landscape* secara otomatis.</p>
-            <button class="btn-primary" id="start-app-btn">Mulai & Izinkan Mikrofon</button>
+            <p>Ketuk tombol di bawah untuk mengizinkan mikrofon, masuk ke layar penuh, dan mulai latihan.</p>
+            <button class="btn-primary" id="start-app-btn">Mulai Aplikasi</button>
         </div>
     </div>
 
-    <!-- Peringatan Posisi HP Vertikal -->
+    <!-- Peringatan Vertikal -->
     <div id="orientation-warning">
         <h3>📱 Putar HP Anda ke Posisi Landscape</h3>
-        <p>Agar pas ditaruh di depan piano, mohon putar perangkat Anda secara mendatar.</p>
+        <p>Agar pas ditaruh di depan piano, mohon putar perangkat secara mendatar.</p>
     </div>
 
-    <!-- Kontainer Aplikasi -->
+    <!-- Kontainer Utama -->
     <div id="app-container" style="display:none;">
         <header>
             <div class="app-title">
@@ -244,12 +248,12 @@
                 </select>
                 <button class="ctrl-btn active" id="mode-btn">Wait</button>
                 <button class="ctrl-btn" id="play-btn">▶ Play</button>
-                <button class="ctrl-btn" id="mic-status-btn">🎤 On</button>
+                <button class="ctrl-btn" id="test-mode-btn">🔬 Test Mic</button>
             </div>
         </header>
 
         <div class="metrics-bar">
-            <div class="metric-item">Note: <span id="detected-note-display">-</span></div>
+            <div class="metric-item">Note Aktif: <span id="detected-note-display">-</span></div>
             <div class="metric-item">Skor: <span id="score-display">0</span></div>
             <div class="metric-item">Combo: <span id="combo-display">0</span></div>
             <div class="metric-item">Akurasi: <span id="accuracy-display">100%</span></div>
@@ -272,6 +276,7 @@
         let analyser = null;
         let micStream = null;
         let isMicActive = false;
+        let isTestMode = false;
 
         const songsData = {
             finale: [
@@ -293,8 +298,208 @@
         let isPlaying = false, waitMode = true, songTime = 0, score = 0, combo = 0, totalHits = 0, correctHits = 0;
 
         const notesList = [
-            {name: 'C3', type: 'white'}, {name: 'C#3', type: 'black'}, {name: 'D3', type: 'white'}, {name: 'D#3', type: 'black'}, {name: 'E3', type: 'white'},
-            {name: 'F3', type: 'white'}, {name: 'F#3', type: 'black'}, {name: 'G3', type: 'white'}, {name: 'G#3', type: 'black'}, {name: 'A3', type: 'white'}, {name: 'A#3', type: 'black'}, {name: 'B3', type: 'white'},
+            {name: 'C3', type: 'white', freq: 130.81}, {name: 'C#3', type: 'black', freq: 138.59}, {name: 'D3', type: 'white', freq: 146.83}, {name: 'D#3', type: 'black', freq: 155.56}, {name: 'E3', type: 'white', freq: 164.81},
+            {name: 'F3', type: 'white', freq: 174.61}, {name: 'F#3', type: 'black', freq: 185.00}, {name: 'G3', type: 'white', freq: 196.00}, {name: 'G#3', type: 'black', freq: 207.65}, {name: 'A3', type: 'white', freq: 220.00}, {name: 'A#3', type: 'black', freq: 233.08}, {name: 'B3', type: 'white', freq: 246.94},
+            {name: 'C4', type: 'white', freq: 261.63}, {name: 'C#4', type: 'black', freq: 277.18}, {name: 'D4', type: 'white', freq: 293.66}, {name: 'D#4', type: 'black', freq: 311.13}, {name: 'E4', type: 'white', freq: 329.63},
+            {name: 'F4', type: 'white', freq: 349.23}, {name: 'F#4', type: 'black', freq: 369.99}, {name: 'G4', type: 'white', freq: 392.00}, {name: 'G#4', type: 'black', freq: 415.30}, {name: 'A4', type: 'white', freq: 440.00}, {name: 'A#4', type: 'black', freq: 466.16}, {name: 'B4', type: 'white', freq: 493.88}
+        ];
+
+        function initPianoUI() {
+            const container = document.getElementById('piano-container');
+            container.innerHTML = '';
+            let whiteIndex = 0;
+            notesList.forEach((n) => {
+                const keyEl = document.createElement('div');
+                keyEl.className = `key ${n.type}`;
+                keyEl.dataset.note = n.name;
+                if (n.type === 'white') {
+                    keyEl.style.left = (whiteIndex * 32) + 'px';
+                    whiteIndex++;
+                } else {
+                    keyEl.style.left = ((whiteIndex * 32) - 10) + 'px';
+                }
+                keyEl.addEventListener('pointerdown', (e) => {
+                    e.preventDefault();
+                    triggerNote(n.name);
+                });
+                container.appendChild(keyEl);
+            });
+        }
+
+        // Tangani Tombol Mulai dengan pointerdown agar sangat responsif
+        async function handleStartApp(e) {
+            e.preventDefault();
+            try {
+                const docEl = document.documentElement;
+                if (docEl.requestFullscreen) await docEl.requestFullscreen();
+                if (screen.orientation && screen.orientation.lock) {
+                    await screen.orientation.lock('landscape').catch(() => {});
+                }
+            } catch (err) {}
+
+            try {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                if (audioCtx.state === 'suspended') await audioCtx.resume();
+
+                micStream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
+                const source = audioCtx.createMediaStreamSource(micStream);
+                analyser = audioCtx.createAnalyser();
+                analyser.fftSize = 2048;
+                source.connect(analyser);
+                isMicActive = true;
+            } catch (err) {
+                console.warn("Mic tidak aktif:", err);
+            }
+
+            modal.style.display = 'none';
+            appContainer.style.display = 'flex';
+            initPianoUI();
+            checkOrientation();
+            requestAnimationFrame(updateLoop);
+        }
+
+        startBtn.addEventListener('pointerdown', handleStartApp);
+
+        function checkOrientation() {
+            if (window.innerHeight > window.innerWidth) {
+                orientationWarning.style.display = 'flex';
+            } else {
+                orientationWarning.style.display = 'none';
+            }
+        }
+        window.addEventListener('resize', checkOrientation);
+        window.addEventListener('orientationchange', checkOrientation);
+
+        document.getElementById('mode-btn').addEventListener('click', (e) => {
+            waitMode = !waitMode;
+            e.target.innerText = waitMode ? "Wait" : "Flow";
+            e.target.classList.toggle('active', waitMode);
+        });
+
+        document.getElementById('play-btn').addEventListener('click', (e) => {
+            isPlaying = !isPlaying;
+            e.target.innerText = isPlaying ? "⏸ Pause" : "▶ Play";
+            e.target.classList.toggle('active', isPlaying);
+        });
+
+        // Tombol Mode Test Mic / Key Testing
+        const testBtn = document.getElementById('test-mode-btn');
+        testBtn.addEventListener('click', (e) => {
+            isTestMode = !isTestMode;
+            e.target.innerText = isTestMode ? "🔬 Testing..." : "🔬 Test Mic";
+            e.target.classList.toggle('test-active', isTestMode);
+        });
+
+        document.getElementById('song-select').addEventListener('change', (e) => {
+            currentSongNotes = songsData[e.target.value];
+            document.getElementById('current-song-title').innerText = e.target.options[e.target.selectedIndex].text;
+            songTime = 0; score = 0; combo = 0;
+        });
+
+        function triggerNote(noteName) {
+            highlightKey(noteName, 'pressed');
+            document.getElementById('detected-note-display').innerText = noteName;
+            if (isPlaying) {
+                score += 100 * (combo + 1);
+                combo++;
+                correctHits++;
+                totalHits++;
+                document.getElementById('score-display').innerText = score;
+                document.getElementById('combo-display').innerText = combo;
+            }
+        }
+
+        function highlightKey(noteName, className) {
+            const keyEl = document.querySelector(`[data-note="${noteName}"]`);
+            if (keyEl) {
+                keyEl.classList.add(className);
+                setTimeout(() => keyEl.classList.remove(className), 180);
+            }
+        }
+
+        // Pitch Detection Sederhana dari Mikrofon
+        const noteStrings = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
+        function autoCorrelate(buf, sampleRate) {
+            let SIZE = buf.length;
+            let sumOfSquares = 0;
+            for (let i = 0; i < SIZE; i++) sumOfSquares += buf[i] * buf[i];
+            let rms = Math.sqrt(sumOfSquares / SIZE);
+            if (rms < 0.015) return -1;
+
+            let r1 = 0, r2 = SIZE - 1, threshold = 0.2;
+            for (let i = 0; i < SIZE / 2; i++) { if (Math.abs(buf[i]) < threshold) { r1 = i; break; } }
+            for (let i = 1; i < SIZE / 2; i++) { if (Math.abs(buf[SIZE - i]) < threshold) { r2 = SIZE - i; break; } }
+
+            buf = buf.slice(r1, r2);
+            SIZE = buf.length;
+            let c = new Array(SIZE).fill(0);
+            for (let i = 0; i < SIZE; i++) {
+                for (let j = 0; j < SIZE - i; j++) c[i] += buf[j] * buf[j + i];
+            }
+            let d = 0; while (c[d] > c[d + 1]) d++;
+            let maxval = -1, maxpos = -1;
+            for (let i = d; i < SIZE; i++) {
+                if (c[i] > maxval) { maxval = c[i]; maxpos = i; }
+            }
+            return sampleRate / maxpos;
+        }
+
+        function noteFromPitch(frequency) {
+            let noteNum = 12 * (Math.log(frequency / 440) / Math.log(2));
+            return Math.round(noteNum) + 69;
+        }
+
+        const canvas = document.getElementById('falling-canvas');
+        const ctx = canvas.getContext('2d');
+
+        function updateLoop() {
+            if (canvas.width !== canvas.clientWidth || canvas.height !== canvas.clientHeight) {
+                canvas.width = canvas.clientWidth;
+                canvas.height = canvas.clientHeight;
+            }
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Deteksi Real-time dari Mikrofon
+            if (isMicActive && analyser) {
+                let buf = new Float32Array(2048);
+                analyser.getFloatTimeDomainData(buf);
+                let pitch = autoCorrelate(buf, audioCtx.sampleRate);
+                if (pitch !== -1) {
+                    let midiNum = noteFromPitch(pitch);
+                    let noteName = noteStrings[midiNum % 12] + (Math.floor(midiNum / 12) - 1);
+                    document.getElementById('detected-note-display').innerText = noteName;
+                    
+                    if (isTestMode) {
+                        highlightKey(noteName, 'mic-detected');
+                    }
+                }
+            }
+
+            if (isPlaying) songTime += 0.016;
+
+            // Render Falling Notes
+            const laneWidth = canvas.width / notesList.length;
+            currentSongNotes.forEach(n => {
+                const noteIndex = notesList.findIndex(item => item.name === n.note);
+                if (noteIndex !== -1) {
+                    const x = noteIndex * laneWidth;
+                    const timeDiff = n.time - songTime;
+                    const y = canvas.height - (timeDiff * 130) - 40;
+                    const h = n.dur * 130;
+
+                    if (y > -60 && y < canvas.height + 60) {
+                        ctx.fillStyle = '#38bdf8';
+                        ctx.fillRect(x + 1, y, laneWidth - 2, h);
+                    }
+                }
+            });
+
+            requestAnimationFrame(updateLoop);
+        }
+    </script>
+</body>
+</html>'},
             {name: 'C4', type: 'white'}, {name: 'C#4', type: 'black'}, {name: 'D4', type: 'white'}, {name: 'D#4', type: 'black'}, {name: 'E4', type: 'white'},
             {name: 'F4', type: 'white'}, {name: 'F#4', type: 'black'}, {name: 'G4', type: 'white'}, {name: 'G#4', type: 'black'}, {name: 'A4', type: 'white'}, {name: 'A#4', type: 'black'}, {name: 'B4', type: 'white'}
         ];
